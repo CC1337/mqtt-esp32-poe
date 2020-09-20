@@ -1,93 +1,143 @@
-#include <SPI.h>
-#include <WiFiClientSecure.h>
-#include <EEPROM.h>
+#include <WiFiClient.h>
 #include <PubSubClient.h>
-#include <ESPmDNS.h>
 #include "config.h"
 
 #define ETH_CLK_MODE ETH_CLOCK_GPIO17_OUT
 #define ETH_PHY_POWER 12
+
 #include <ETH.h>
+
+// CHANGE THESE SETTINGS FOR YOUR APPLICATION
+const char* mqttTopic = "ESP32-Wohnmobilgarage";
+const char* mqttServerIp = "192.168.0.90"; // IP address of the MQTT broker
+const short mqttServerPort = 1883; // IP port of the MQTT broker
+const char* mqttClientName = mqttTopic;
+const char* mqttUsername = NULL;
+const char* mqttPassword = NULL;
 
 IPAddress local_IP(192, 168, 0, 95);
 IPAddress gateway(192, 168, 0, 1);
 IPAddress subnet(255, 255, 255, 0);
-IPAddress primaryDNS(192, 168, 0, 1); 
 
-const char* mqttServer = "192.168.0.90";
-const char* mqttTopic = "ESP32-Wohnmobilgarage";
-
-unsigned long lastEthernetMaintain = millis();
-unsigned long lastHealthPing = millis();
-bool wasOffline = false;
-
-WiFiClientSecure espClient;
+// Initializations of network clients
+WiFiClient espClient;
 PubSubClient mqttClient(espClient);
 
-void hardwareReset() {
-  Serial.println("HARDWARE RESET");
-  digitalWrite(RESET_PIN, LOW);
+static bool eth_connected = false;
+uint64_t chipid;
+unsigned long lastHealthPing = millis();
+
+
+void WiFiEvent(WiFiEvent_t event)
+{
+  switch (event) {
+    case SYSTEM_EVENT_ETH_START:
+      Serial.println("ETH Started");
+      //set eth hostname here
+      ETH.setHostname(mqttTopic);
+      break;
+    case SYSTEM_EVENT_ETH_CONNECTED:
+      Serial.println("ETH Connected");
+      break;
+    case SYSTEM_EVENT_ETH_GOT_IP:
+      Serial.print("ETH MAC: ");
+      Serial.print(ETH.macAddress());
+      Serial.print(", IPv4: ");
+      Serial.print(ETH.localIP());
+      if (ETH.fullDuplex()) {
+        Serial.print(", FULL_DUPLEX");
+      }
+      Serial.print(", ");
+      Serial.print(ETH.linkSpeed());
+      Serial.println("Mbps");
+      eth_connected = true;
+      break;
+    case SYSTEM_EVENT_ETH_DISCONNECTED:
+      Serial.println("ETH Disconnected");
+      eth_connected = false;
+      break;
+    case SYSTEM_EVENT_ETH_STOP:
+      Serial.println("ETH Stopped");
+      eth_connected = false;
+      break;
+    default:
+      break;
+  }
 }
 
-// --------------------------- SETUP ---------------------------
+void callback(char* topic, byte* payload, unsigned int length) {
+  Serial.print("Message arrived [");
+  Serial.print(topic);
+  Serial.print("] ");
+  for (int i=0;i<length;i++) {
+    Serial.print((char)payload[i]);
+  }
+  Serial.println();
+}
+
+void reconnect() {
+  // Loop until we're reconnected
+  while (!mqttClient.connected()) {
+    Serial.print("Attempting MQTT connection...");
+    // Attempt to connect
+    if (mqttClient.connect(mqttClientName)) {
+    //if (mqttClient.connect(mqttClientName, mqttUsername, mqttPassword) { // if credentials is nedded
+      Serial.println("connected");
+      publishStates();
+      mqttClient.subscribe(mqttTopic);
+    } else {
+      Serial.print("failed, rc=");
+      Serial.print(mqttClient.state());
+      Serial.println(" try again in 5 seconds");
+      // Wait 5 seconds before retrying
+      delay(5000);
+    }
+  }
+}
 
 void setup()
 {
-  digitalWrite(RESET_PIN, HIGH);
-  pinMode(RESET_PIN, OUTPUT);
-  
-  if(DEBUG)
+ if(DEBUG)
     Serial.begin(115200);
-
   Serial.println(F("POWER ON."));
+
+  mqttClient.setServer(mqttServerIp, mqttServerPort);
+  mqttClient.setCallback(callback);
+
+  chipid=ESP.getEfuseMac();//The chip ID is essentially its MAC address(length: 6 bytes).
+  Serial.printf("ESP32 Chip ID = %04X",(uint16_t)(chipid>>32));//print High 2 bytes
+  Serial.printf("%08X\n",(uint32_t)chipid);//print Low 4bytes.
+
+  WiFi.onEvent(WiFiEvent);
+
+  ETH.begin();
+  ETH.config(local_IP, gateway, subnet, gateway, gateway);
   
-  startEthernet();
-
-  if (EEPROM.read(RESETINFO_ADDRESS) != 1 && !isOnline()) {
-    Serial.println(F("First start attempt after power on... reseting."));
-    delay(5000);
-    EEPROM.write(RESETINFO_ADDRESS, 1);
-    hardwareReset();
-  }
-  EEPROM.write(RESETINFO_ADDRESS, 0);
-
-  delay(1000);
-
   pinMode(BWM_VORGARTEN_PIN, INPUT_PULLUP);
   pinMode(BWM_GARTEN_PIN, INPUT_PULLUP);
-
-  healthPing(true);
-  
+ 
   Serial.println(F("Ready"));
 }
 
 void loop()
 {
-  checkEthernet();
-  mqttClient.loop();
-  healthPing(false);
-
-  //TODO
-
-  delay(10);
+  // check if ethernet is connected
+  if (eth_connected) {
+    // now take care of MQTT client...
+    if (!mqttClient.connected()) {
+      reconnect();
+    } else {
+      mqttClient.loop();
+    }
+    healthPing(false);
+  }
 }
 
-void checkEthernet() {
-  if (millis()-lastEthernetMaintain < 60000)
-    return;
-  Serial.println(F("Ethernet check starts."));
-  if (!isOnline())
-    wasOffline = true;
-  lastEthernetMaintain = millis();
-  if (isOnline() && wasOffline) {
-    wasOffline = false;
-    String onlineText = String("Wieder online. IP: ");
-    onlineText.concat(ip2Str(WiFi.localIP()));
-    Serial.println(onlineText);
-      mqttPublish("status", "online_again", ip2Str(WiFi.localIP()), onlineText);
-  } else if (!isOnline()) {
-    Serial.println(F("Ethernet connection failed."));
-  }
+void publishStates() {
+  String onlineText = String(mqttTopic);
+  onlineText.concat(" online.");
+  mqttPublish("status", "online", ip2Str(ETH.localIP()), onlineText);
+  healthPing(true);
 }
 
 void mqttPublish(String subtopic, String action, String payload, String fullMessage) {
@@ -97,68 +147,30 @@ void mqttPublish(String subtopic, String action, String payload, String fullMess
   message.concat(payload.c_str());
   message.concat("\", \"fullMessage\": \"");
   message.concat(fullMessage.c_str());
+  message.concat("\", \"randomNumber\": \"");
+  message.concat(String(random(65535)).c_str());
   message.concat("\"}");
   subtopic = "/" + subtopic;
   subtopic = mqttTopic + subtopic;
-  mqttConnect();
+
   if(mqttClient.publish(subtopic.c_str(), message.c_str())) {
     Serial.println("Publish message success: " + message);
   } else {
     Serial.println("Could not send message: " + message);
   }
   delay(300);
-  mqttDisconnect();
 }
-
-void startEthernet() {
-  Serial.print(F("Starting ethernet and connecting to MQTT server... "));
-  //WiFi.begin(mac, ip);
-  ETH.begin();
-  WiFi.config(local_IP, primaryDNS, gateway, subnet);
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-  }
-  mqttClient.setServer(mqttServer, 1883);   
-  if (!mqttConnect()) 
-  {
-    Serial.println("failed.");
-  }
-  else {
-    Serial.println(WiFi.localIP());
-    wasOffline = false;
-  }
-
-  mqttDisconnect();
-
-  String onlineText = String("Online. IP: ");
-  onlineText.concat(ip2Str(WiFi.localIP()));
-
-  mqttPublish("status", "online_initial", ip2Str(WiFi.localIP()), onlineText);
-}
-
-bool isOnline() {
-  bool res = mqttConnect();
-  mqttDisconnect();
-  return res;
-}
-
-bool mqttConnect() {
-  return mqttClient.connect(mqttTopic);
-}
-
-bool mqttDisconnect() {
-   mqttClient.disconnect();
-}
-
 
 void healthPing(bool force) {
   if (millis()-lastHealthPing < HealthPingDelayMs && !force)
     return;
   lastHealthPing = millis();
-  Serial.print(F("Starting health ping... "));
-  
-  mqttPublish("status", "health_ping", "isAlive", "");
-  
+  Serial.println(F("Starting health ping... "));
+
+  String payload = "isAlive_";
+  payload.concat(String(random(65535)));
+  mqttPublish("health", "health_ping", payload, "");
+
   Serial.println(F("end."));
 }
 
