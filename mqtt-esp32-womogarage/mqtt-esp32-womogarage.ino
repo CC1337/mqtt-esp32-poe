@@ -17,6 +17,49 @@ uint64_t chipid;
 unsigned long lastHealthPing = millis();
 
 
+// BEGIN TODO move to class..
+void initStates() {
+  for (byte i=0; i<StateTopicCount; i++)
+    initState(String(StateTopics[i]));
+}
+
+void initState(String stateTopic) {
+  String topicToSubscribe  = stateTopic + STATE_TOPIC_SETTER;
+  subscribe(topicToSubscribe);
+  publishInitialStateSetterTopics(topicToSubscribe);
+}
+
+void publishInitialStateSetterTopics(String setterTopic) {
+  // TODO save/restore initial value from EEPROM
+  //mqttClient.publish(stateTopic.c_str(), false);
+  mqttClient.publish(setterTopic.c_str(), false);
+}
+
+void callbackState(String stateTopic, String newState) {
+  bool targetState;
+  if (newState == "true")
+    targetState = true;
+  if (newState == "false")
+    targetState = false;
+  else
+    return;
+
+  for (byte i=0; i<StateTopicCount; i++) {
+    String currentTopic = String(StateTopics[i]);
+    String currentTopicSetter = currentTopic + STATE_TOPIC_SETTER;
+    if (stateTopic == currentTopicSetter) {
+      // TODO actually set something
+      Serial.print(currentTopicSetter);
+      Serial.print(" = ");
+      Serial.println(targetState);
+      mqttClient.publish(currentTopic.c_str(), String(targetState).c_str());
+    }
+  }
+}
+
+// END TODO
+
+
 void WiFiEvent(WiFiEvent_t event)
 {
   switch (event) {
@@ -58,10 +101,13 @@ void callback(char* topic, byte* payload, unsigned int length) {
   Serial.print("Message arrived [");
   Serial.print(topic);
   Serial.print("] ");
+  String payloadString;
   for (int i=0;i<length;i++) {
     Serial.print((char)payload[i]);
+    payloadString.concat((char)payload[i]);
   }
   Serial.println();
+  callbackState(String(topic), payloadString);
 }
 
 void reconnect() {
@@ -75,7 +121,7 @@ void reconnect() {
       publishStates();
      // mqttClient.subscribe("*");
      // mqttClient.subscribe(MqttTopic);
-      mqttClient.subscribe("ESP32-Wohnmobilgarage/#");
+     // mqttClient.subscribe("ESP32-Wohnmobilgarage/#");
     } else {
       Serial.print("failed, rc=");
       Serial.print(mqttClient.state());
@@ -150,6 +196,13 @@ void mqttPublish(String subtopic, String action, String payload, String fullMess
     Serial.println("Could not send message: " + message);
   }
   delay(300);
+}
+
+void subscribe(String subtopic) {
+  String topicToSubscribe = String(MqttTopic);
+  topicToSubscribe.concat("/");
+  topicToSubscribe.concat(subtopic);
+  mqttClient.subscribe(topicToSubscribe.c_str());
 }
 
 void healthPing(bool force) {

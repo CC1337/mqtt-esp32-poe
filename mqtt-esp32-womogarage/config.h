@@ -45,7 +45,7 @@ const char* MqttPassword = NULL;
  * ---------- TOPIC ASSIGNMENTS ----------
  */
 
-
+#define STATE_TOPIC_SETTER "/set/state"
 const byte StateTopicCount = 2;
 const char StateTopics[StateTopicCount][TOPIC_MAX_LENGTH] =
 {
