@@ -7,17 +7,6 @@
 
 #include <ETH.h>
 
-// CHANGE THESE SETTINGS FOR YOUR APPLICATION
-const char* mqttTopic = "ESP32-Wohnmobilgarage";
-const char* mqttServerIp = "192.168.0.90"; // IP address of the MQTT broker
-const short mqttServerPort = 1883; // IP port of the MQTT broker
-const char* mqttClientName = mqttTopic;
-const char* mqttUsername = NULL;
-const char* mqttPassword = NULL;
-
-IPAddress local_IP(192, 168, 0, 95);
-IPAddress gateway(192, 168, 0, 1);
-IPAddress subnet(255, 255, 255, 0);
 
 // Initializations of network clients
 WiFiClient espClient;
@@ -34,7 +23,7 @@ void WiFiEvent(WiFiEvent_t event)
     case SYSTEM_EVENT_ETH_START:
       Serial.println("ETH Started");
       //set eth hostname here
-      ETH.setHostname(mqttTopic);
+      ETH.setHostname(MqttTopic);
       break;
     case SYSTEM_EVENT_ETH_CONNECTED:
       Serial.println("ETH Connected");
@@ -80,11 +69,13 @@ void reconnect() {
   while (!mqttClient.connected()) {
     Serial.print("Attempting MQTT connection...");
     // Attempt to connect
-    if (mqttClient.connect(mqttClientName)) {
-    //if (mqttClient.connect(mqttClientName, mqttUsername, mqttPassword) { // if credentials is nedded
+    if (mqttClient.connect(MqttClientName)) {
+    //if (mqttClient.connect(MqttClientName, MqttUsername, MqttPassword) { // if credentials is nedded
       Serial.println("connected");
       publishStates();
-      mqttClient.subscribe(mqttTopic);
+     // mqttClient.subscribe("*");
+     // mqttClient.subscribe(MqttTopic);
+      mqttClient.subscribe("ESP32-Wohnmobilgarage/#");
     } else {
       Serial.print("failed, rc=");
       Serial.print(mqttClient.state());
@@ -101,7 +92,7 @@ void setup()
     Serial.begin(115200);
   Serial.println(F("POWER ON."));
 
-  mqttClient.setServer(mqttServerIp, mqttServerPort);
+  mqttClient.setServer(MqttServerIp, MqttServerPort);
   mqttClient.setCallback(callback);
 
   chipid=ESP.getEfuseMac();//The chip ID is essentially its MAC address(length: 6 bytes).
@@ -134,7 +125,7 @@ void loop()
 }
 
 void publishStates() {
-  String onlineText = String(mqttTopic);
+  String onlineText = String(MqttTopic);
   onlineText.concat(" online.");
   mqttPublish("status", "online", ip2Str(ETH.localIP()), onlineText);
   healthPing(true);
@@ -151,7 +142,7 @@ void mqttPublish(String subtopic, String action, String payload, String fullMess
   message.concat(String(random(65535)).c_str());
   message.concat("\"}");
   subtopic = "/" + subtopic;
-  subtopic = mqttTopic + subtopic;
+  subtopic = MqttTopic + subtopic;
 
   if(mqttClient.publish(subtopic.c_str(), message.c_str())) {
     Serial.println("Publish message success: " + message);
