@@ -15,7 +15,7 @@ PubSubClient mqttClient(espClient);
 static bool eth_connected = false;
 uint64_t chipid;
 unsigned long lastHealthPing = millis();
-
+boolean mqttHasBeenInitializedBefore = false;
 
 // BEGIN TODO move to class..
 void initStates() {
@@ -32,29 +32,35 @@ void initState(String stateTopic) {
 void publishInitialStateSetterTopics(String setterTopic) {
   // TODO save/restore initial value from EEPROM
   //mqttClient.publish(stateTopic.c_str(), false);
-  mqttClient.publish(setterTopic.c_str(), false);
+  publish(setterTopic,  bool2Str(false));
 }
 
 void callbackState(String stateTopic, String newState) {
   bool targetState;
-  if (newState == "true")
+  Serial.println(newState);
+  if (newState == "true" || newState == "1")
     targetState = true;
-  if (newState == "false")
+  else if (newState == "false" || newState == "0")
     targetState = false;
   else
     return;
 
   for (byte i=0; i<StateTopicCount; i++) {
     String currentTopic = String(StateTopics[i]);
-    String currentTopicSetter = currentTopic + STATE_TOPIC_SETTER;
+    String currentTopicSetter = String(MqttTopic) + "/" + currentTopic + STATE_TOPIC_SETTER;
+
     if (stateTopic == currentTopicSetter) {
       // TODO actually set something
-      Serial.print(currentTopicSetter);
+      Serial.print(currentTopic);
       Serial.print(" = ");
       Serial.println(targetState);
-      mqttClient.publish(currentTopic.c_str(), String(targetState).c_str());
+      publish(currentTopic + "/state", bool2Str(targetState));
     }
   }
+}
+
+String bool2Str(bool buhl) {
+  return buhl ? "true" : "false";
 }
 
 // END TODO
@@ -116,12 +122,11 @@ void reconnect() {
     Serial.print("Attempting MQTT connection...");
     // Attempt to connect
     if (mqttClient.connect(MqttClientName)) {
-    //if (mqttClient.connect(MqttClientName, MqttUsername, MqttPassword) { // if credentials is nedded
+    //if (mqttClient.connect(MqttClientName, MqttUsername, MqttPassword) { // if credentials is needed
       Serial.println("connected");
-      publishStates();
-     // mqttClient.subscribe("*");
-     // mqttClient.subscribe(MqttTopic);
-     // mqttClient.subscribe("ESP32-Wohnmobilgarage/#");
+      if (!mqttHasBeenInitializedBefore)
+        initialMqttInit();
+      mqttHasBeenInitializedBefore = true;
     } else {
       Serial.print("failed, rc=");
       Serial.print(mqttClient.state());
@@ -170,7 +175,12 @@ void loop()
   }
 }
 
-void publishStates() {
+void initialMqttInit() {
+  publishInitialStatus();
+  initStates();
+}
+
+void publishInitialStatus() {
   String onlineText = String(MqttTopic);
   onlineText.concat(" online.");
   mqttPublish("status", "online", ip2Str(ETH.localIP()), onlineText);
@@ -203,6 +213,18 @@ void subscribe(String subtopic) {
   topicToSubscribe.concat("/");
   topicToSubscribe.concat(subtopic);
   mqttClient.subscribe(topicToSubscribe.c_str());
+  Serial.println("Subscribed to: " + topicToSubscribe);
+}
+
+void publish(String subtopic, String payload) {
+  String topicToPublish = String(MqttTopic);
+  topicToPublish.concat("/");
+  topicToPublish.concat(subtopic);
+  if(mqttClient.publish(topicToPublish.c_str(), payload.c_str())) {
+    Serial.println("Publish message success: [" + topicToPublish + "] " + payload);
+  } else {
+    Serial.println("Could not send message: [" + topicToPublish + "] " + payload);
+  }
 }
 
 void healthPing(bool force) {
