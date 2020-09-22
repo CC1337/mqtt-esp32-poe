@@ -37,7 +37,6 @@ void publishInitialStateSetterTopics(String setterTopic) {
 
 void callbackState(String stateTopic, String newState) {
   bool targetState;
-  Serial.println(newState);
   if (newState == "true" || newState == "1")
     targetState = true;
   else if (newState == "false" || newState == "0")
