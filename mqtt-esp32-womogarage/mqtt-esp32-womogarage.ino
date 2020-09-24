@@ -1,6 +1,7 @@
 #include <WiFiClient.h>
 #include <PubSubClient.h>
 #include "config.h"
+#include "MotionSensor.h"
 
 #define ETH_CLK_MODE ETH_CLOCK_GPIO17_OUT
 #define ETH_PHY_POWER 12
@@ -115,26 +116,21 @@ void callback(char* topic, byte* payload, unsigned int length) {
   callbackState(String(topic), payloadString);
 }
 
-void reconnect() {
-  // Loop until we're reconnected
-  while (!mqttClient.connected()) {
-    Serial.print("Attempting MQTT connection...");
-    // Attempt to connect
-    if (mqttClient.connect(MqttClientName)) {
-    //if (mqttClient.connect(MqttClientName, MqttUsername, MqttPassword) { // if credentials is needed
-      Serial.println("connected");
-      if (!mqttHasBeenInitializedBefore)
-        initialMqttInit();
-      mqttHasBeenInitializedBefore = true;
-    } else {
-      Serial.print("failed, rc=");
-      Serial.print(mqttClient.state());
-      Serial.println(" try again in 5 seconds");
-      // Wait 5 seconds before retrying
-      delay(5000);
-    }
-  }
+// MOTION SENSORS
+
+MotionSensor motionSensors[MotionSensorCount];
+
+void initMotionSensors() {
+  for (byte i=0; i<MotionSensorCount; i++)
+    motionSensors[i].begin(MotionSensorPins[i], MotionSensorTopics[i]);
 }
+
+void checkMotionSensors() {
+  for (byte i=0; i<MotionSensorCount; i++)
+    motionSensors[i].check();
+}
+
+// ------------------------------------ SETUP ------------------------------------
 
 void setup()
 {
@@ -154,11 +150,14 @@ void setup()
   ETH.begin();
   ETH.config(local_IP, gateway, subnet, gateway, gateway);
   
-  pinMode(BWM_VORGARTEN_PIN, INPUT_PULLUP);
-  pinMode(BWM_GARTEN_PIN, INPUT_PULLUP);
+  initMotionSensors();
  
   Serial.println(F("Ready"));
 }
+
+
+// ------------------------------------ LOOP ------------------------------------
+
 
 void loop()
 {
@@ -169,8 +168,30 @@ void loop()
       reconnect();
     } else {
       mqttClient.loop();
+      healthPing(false);
+      checkMotionSensors();
     }
-    healthPing(false);
+  }
+}
+
+void reconnect() {
+  // Loop until we're reconnected
+  while (!mqttClient.connected()) {
+    Serial.print("Attempting MQTT connection...");
+    // Attempt to connect
+    if (mqttClient.connect(MqttClientName)) {
+    //if (mqttClient.connect(MqttClientName, MqttUsername, MqttPassword) { // if credentials is needed
+      Serial.println("connected");
+      if (!mqttHasBeenInitializedBefore)
+        initialMqttInit();
+      mqttHasBeenInitializedBefore = true;
+    } else {
+      Serial.print("failed, rc=");
+      Serial.print(mqttClient.state());
+      Serial.println(" try again in 5 seconds");
+      // Wait 5 seconds before retrying
+      delay(5000);
+    }
   }
 }
 

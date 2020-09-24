@@ -2,11 +2,21 @@
 #ifndef config_h
 #define config_h
 
+
 /*
  * ---------- DEBUG ----------
  */
 
 #define DEBUG true
+
+
+/*
+ * ---------- PINS ----------
+ */
+
+#define BWM_VORGARTEN_PIN 4
+#define BWM_GARTEN_PIN 5
+
 
 /*
  * ---------- NETWORK ----------
@@ -15,6 +25,7 @@
 IPAddress local_IP(192, 168, 0, 95);
 IPAddress gateway(192, 168, 0, 1);
 IPAddress subnet(255, 255, 255, 0);
+
 
 /*
  * ---------- MQTT BASE SETUP ----------
@@ -42,7 +53,7 @@ const char* MqttPassword = NULL;
 
 
 /*
- * ---------- TOPIC ASSIGNMENTS ----------
+ * ---------- OUTPUTSTATE TOPIC ASSIGNMENTS ----------
  */
 
 #define STATE_TOPIC_SETTER "/set/state"
@@ -53,12 +64,22 @@ const char StateTopics[StateTopicCount][TOPIC_MAX_LENGTH] =
   WOHNMOBIL_STECKDOSE
 };
 
+
 /*
- * ---------- PINS ----------
+ * ---------- MOTIONSENSOR TOPIC ASSIGNMENTS ----------
  */
 
-#define BWM_VORGARTEN_PIN 10
-#define BWM_GARTEN_PIN 11
+const byte MotionSensorCount = 2;
+const char MotionSensorTopics[MotionSensorCount][TOPIC_MAX_LENGTH] =
+{
+  BWM_VORGARTEN_SUBTOPIC,
+  BWM_GARTEN_SUBTOPIC
+};
+const byte MotionSensorPins[MotionSensorCount] =
+{
+  BWM_VORGARTEN_PIN,
+  BWM_GARTEN_PIN
+};
 
 
 /*
@@ -67,8 +88,6 @@ const char StateTopics[StateTopicCount][TOPIC_MAX_LENGTH] =
 
 // Health Ping
 #define HealthPingDelayMs 60000
-
-
 
 
 #endif
