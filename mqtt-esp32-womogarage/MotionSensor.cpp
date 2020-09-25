@@ -1,11 +1,11 @@
 #include "MotionSensor.h"
 
-extern void publish(String subtopic, String payload);
 extern String bool2Str(bool buhl);
 
-void MotionSensor::begin(byte pin, String subtopic) {
+void MotionSensor::begin(byte pin, String subtopic, MqttPubSub* mqtt) {
   _pin = pin;
   _subtopic = subtopic;
+  _mqtt = mqtt;
   pinMode(_pin, INPUT);
 }
 
@@ -23,7 +23,7 @@ void MotionSensor::check() {
 	Serial.print(F(" / Subtopic: "));
 	Serial.println(_subtopic);
 
-	publish(_subtopic, bool2Str(val));
+	_mqtt->publishState(_subtopic, bool2Str(val));
 
   _lastVal = val;
 }

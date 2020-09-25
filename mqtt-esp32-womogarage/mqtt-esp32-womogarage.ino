@@ -2,6 +2,7 @@
 #include <PubSubClient.h>
 #include "config.h"
 #include "MotionSensor.h"
+#include "MqttPubSub.h"
 
 #define ETH_CLK_MODE ETH_CLOCK_GPIO17_OUT
 #define ETH_PHY_POWER 12
@@ -12,6 +13,7 @@
 // Initializations of network clients
 WiFiClient espClient;
 PubSubClient mqttClient(espClient);
+MqttPubSub mqtt;
 
 static bool eth_connected = false;
 uint64_t chipid;
@@ -26,14 +28,14 @@ void initStates() {
 
 void initState(String stateTopic) {
   String topicToSubscribe  = stateTopic + STATE_TOPIC_SETTER;
-  subscribe(topicToSubscribe);
+  mqtt.subscribe(topicToSubscribe);
   publishInitialStateSetterTopics(topicToSubscribe);
 }
 
 void publishInitialStateSetterTopics(String setterTopic) {
   // TODO save/restore initial value from EEPROM
   //mqttClient.publish(stateTopic.c_str(), false);
-  publish(setterTopic,  bool2Str(false));
+  mqtt.publishState(setterTopic,  bool2Str(false));
 }
 
 void callbackState(String stateTopic, String newState) {
@@ -54,7 +56,7 @@ void callbackState(String stateTopic, String newState) {
       Serial.print(currentTopic);
       Serial.print(" = ");
       Serial.println(targetState);
-      publish(currentTopic + "/state", bool2Str(targetState));
+      mqtt.publishState(currentTopic + "/state", bool2Str(targetState));
     }
   }
 }
@@ -122,7 +124,7 @@ MotionSensor motionSensors[MotionSensorCount];
 
 void initMotionSensors() {
   for (byte i=0; i<MotionSensorCount; i++)
-    motionSensors[i].begin(MotionSensorPins[i], MotionSensorTopics[i]);
+    motionSensors[i].begin(MotionSensorPins[i], MotionSensorTopics[i], &mqtt);
 }
 
 void checkMotionSensors() {
@@ -140,6 +142,7 @@ void setup()
 
   mqttClient.setServer(MqttServerIp, MqttServerPort);
   mqttClient.setCallback(callback);
+  mqtt.begin(&mqttClient, String(MqttTopic));
 
   chipid=ESP.getEfuseMac();//The chip ID is essentially its MAC address(length: 6 bytes).
   Serial.printf("ESP32 Chip ID = %04X",(uint16_t)(chipid>>32));//print High 2 bytes
@@ -203,48 +206,8 @@ void initialMqttInit() {
 void publishInitialStatus() {
   String onlineText = String(MqttTopic);
   onlineText.concat(" online.");
-  mqttPublish("status", "online", ip2Str(ETH.localIP()), onlineText);
+  mqtt.publishMessage("status", "online", ip2Str(ETH.localIP()), onlineText);
   healthPing(true);
-}
-
-void mqttPublish(String subtopic, String action, String payload, String fullMessage) {
-  String message = "{ \"action\": \"";
-  message.concat(action.c_str());
-  message.concat("\", \"payload\": \"");
-  message.concat(payload.c_str());
-  message.concat("\", \"fullMessage\": \"");
-  message.concat(fullMessage.c_str());
-  message.concat("\", \"randomNumber\": \"");
-  message.concat(String(random(65535)).c_str());
-  message.concat("\"}");
-  subtopic = "/" + subtopic;
-  subtopic = MqttTopic + subtopic;
-
-  if(mqttClient.publish(subtopic.c_str(), message.c_str())) {
-    Serial.println("Publish message success: " + message);
-  } else {
-    Serial.println("Could not send message: " + message);
-  }
-  delay(300);
-}
-
-void subscribe(String subtopic) {
-  String topicToSubscribe = String(MqttTopic);
-  topicToSubscribe.concat("/");
-  topicToSubscribe.concat(subtopic);
-  mqttClient.subscribe(topicToSubscribe.c_str());
-  Serial.println("Subscribed to: " + topicToSubscribe);
-}
-
-void publish(String subtopic, String payload) {
-  String topicToPublish = String(MqttTopic);
-  topicToPublish.concat("/");
-  topicToPublish.concat(subtopic);
-  if(mqttClient.publish(topicToPublish.c_str(), payload.c_str())) {
-    Serial.println("Publish message success: [" + topicToPublish + "] " + payload);
-  } else {
-    Serial.println("Could not send message: [" + topicToPublish + "] " + payload);
-  }
 }
 
 void healthPing(bool force) {
@@ -255,7 +218,7 @@ void healthPing(bool force) {
 
   String payload = "isAlive_";
   payload.concat(String(random(65535)));
-  mqttPublish("health", "health_ping", payload, "");
+  mqtt.publishMessage("health", "health_ping", payload, "");
 
   Serial.println(F("end."));
 }
