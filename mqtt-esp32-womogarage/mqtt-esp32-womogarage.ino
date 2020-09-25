@@ -1,8 +1,10 @@
+#include <EEPROM.h>
 #include <WiFiClient.h>
 #include <PubSubClient.h>
 #include "config.h"
-#include "MotionSensor.h"
 #include "MqttPubSub.h"
+#include "MotionSensor.h"
+#include "DigitalStateOutput.h"
 
 #define ETH_CLK_MODE ETH_CLOCK_GPIO17_OUT
 #define ETH_PHY_POWER 12
@@ -20,53 +22,10 @@ uint64_t chipid;
 unsigned long lastHealthPing = millis();
 boolean mqttHasBeenInitializedBefore = false;
 
-// BEGIN TODO move to class..
-void initStates() {
-  for (byte i=0; i<StateTopicCount; i++)
-    initState(String(StateTopics[i]));
-}
-
-void initState(String stateTopic) {
-  String topicToSubscribe  = stateTopic + STATE_TOPIC_SETTER;
-  mqtt.subscribe(topicToSubscribe);
-  publishInitialStateSetterTopics(topicToSubscribe);
-}
-
-void publishInitialStateSetterTopics(String setterTopic) {
-  // TODO save/restore initial value from EEPROM
-  //mqttClient.publish(stateTopic.c_str(), false);
-  mqtt.publishState(setterTopic,  bool2Str(false));
-}
-
-void callbackState(String stateTopic, String newState) {
-  bool targetState;
-  if (newState == "true" || newState == "1")
-    targetState = true;
-  else if (newState == "false" || newState == "0")
-    targetState = false;
-  else
-    return;
-
-  for (byte i=0; i<StateTopicCount; i++) {
-    String currentTopic = String(StateTopics[i]);
-    String currentTopicSetter = String(MqttTopic) + "/" + currentTopic + STATE_TOPIC_SETTER;
-
-    if (stateTopic == currentTopicSetter) {
-      // TODO actually set something
-      Serial.print(currentTopic);
-      Serial.print(" = ");
-      Serial.println(targetState);
-      mqtt.publishState(currentTopic + "/state", bool2Str(targetState));
-    }
-  }
-}
 
 String bool2Str(bool buhl) {
   return buhl ? "true" : "false";
 }
-
-// END TODO
-
 
 void WiFiEvent(WiFiEvent_t event)
 {
@@ -115,7 +74,8 @@ void callback(char* topic, byte* payload, unsigned int length) {
     payloadString.concat((char)payload[i]);
   }
   Serial.println();
-  callbackState(String(topic), payloadString);
+
+  callbackDigitalStateOutputs(String(topic), payloadString);
 }
 
 // MOTION SENSORS
@@ -132,6 +92,22 @@ void checkMotionSensors() {
     motionSensors[i].check();
 }
 
+// DIGITAL STATE OUTPUTS
+
+DigitalStateOutput digitalStateOutputs[DigitalStateOutputCount];
+
+void initDigitalStateOutputs() {
+  for (byte i=0; i<DigitalStateOutputCount; i++)
+    digitalStateOutputs[i].begin(DigitalStateOutputPins[i], DigitalStateOutputTopics[i], DigitalStateOutputMemoryAddresses[i], &mqtt);
+}
+
+void callbackDigitalStateOutputs(String messageTopic, String newState) {
+  for (byte i=0; i<DigitalStateOutputCount; i++) {
+    digitalStateOutputs[i].callback(messageTopic, newState);
+  }
+}
+
+
 // ------------------------------------ SETUP ------------------------------------
 
 void setup()
@@ -139,6 +115,8 @@ void setup()
  if(DEBUG)
     Serial.begin(115200);
   Serial.println(F("POWER ON."));
+
+  EEPROM.begin(EEPROM_SIZE);
 
   mqttClient.setServer(MqttServerIp, MqttServerPort);
   mqttClient.setCallback(callback);
@@ -200,7 +178,7 @@ void reconnect() {
 
 void initialMqttInit() {
   publishInitialStatus();
-  initStates();
+  initDigitalStateOutputs();
 }
 
 void publishInitialStatus() {

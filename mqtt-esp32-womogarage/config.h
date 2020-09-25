@@ -11,14 +11,6 @@
 
 
 /*
- * ---------- PINS ----------
- */
-
-#define BWM_VORGARTEN_PIN 4
-#define BWM_GARTEN_PIN 5
-
-
-/*
  * ---------- NETWORK ----------
  */
 
@@ -53,15 +45,44 @@ const char* MqttPassword = NULL;
 
 
 /*
+ * ---------- PINS ----------
+ */
+
+#define BWM_VORGARTEN_PIN 4
+#define BWM_GARTEN_PIN 5
+#define VORGARTEN_STRAHLER_PIN 13
+#define WOHNMOBIL_STECKDOSE_PIN 14
+
+
+/*
+ * ---------- FLASH MEMORY ----------
+ */
+
+#define EEPROM_SIZE 10
+
+#define VORGARTEN_STRAHLER_MEMORY_ADDRESS 1
+#define WOHNMOBIL_STECKDOSE_MEMORY_ADDRESS 2
+
+
+/*
  * ---------- OUTPUTSTATE TOPIC ASSIGNMENTS ----------
  */
 
-#define STATE_TOPIC_SETTER "/set/state"
-const byte StateTopicCount = 2;
-const char StateTopics[StateTopicCount][TOPIC_MAX_LENGTH] =
+const byte DigitalStateOutputCount = 2;
+const char DigitalStateOutputTopics[DigitalStateOutputCount][TOPIC_MAX_LENGTH] =
 {
   VORGARTEN_STRAHLER_SUBTOPIC,
   WOHNMOBIL_STECKDOSE
+};
+const byte DigitalStateOutputPins[DigitalStateOutputCount] =
+{
+  VORGARTEN_STRAHLER_PIN,
+  WOHNMOBIL_STECKDOSE_PIN
+};
+const byte DigitalStateOutputMemoryAddresses[DigitalStateOutputCount] =
+{
+  VORGARTEN_STRAHLER_MEMORY_ADDRESS,
+  WOHNMOBIL_STECKDOSE_MEMORY_ADDRESS
 };
 
 
