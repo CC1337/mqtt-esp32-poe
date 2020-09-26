@@ -115,7 +115,7 @@ const byte MotionSensorPins[MotionSensorCount] =
  */
 
 const byte LedSegmentCount = 3;
-const char LedSegmentTopicss[LedSegmentCount][TOPIC_MAX_LENGTH] =
+const char LedSegmentTopics[LedSegmentCount][TOPIC_MAX_LENGTH] =
 {
   LED_VG_VERT_3_SUBTOPIC,
   LED_VG_VERT_2_SUBTOPIC,

@@ -2,6 +2,11 @@
 #include "LedSegment.h"
 
 void LedSegment::begin(int ledOffset, int ledCount, String subtopic, int memoryAddress, MqttPubSub* mqtt) {
+  Serial.print("Init LedSegment - ledOffset: " + ledOffset);
+  Serial.print(" | ledCount: " + ledCount);
+  Serial.print(" | subtopic: " + subtopic);
+  Serial.println(" | memoryAddress: " + memoryAddress);
+
   _ledOffset = ledOffset;
   _ledCount = ledCount;
   _subtopic = subtopic;
@@ -26,7 +31,7 @@ void LedSegment::restoreFromEepromAndPublish() {
   byte eepromSpeed = EEPROM.read(_memoryAddressSpeed);
   setLevel(eepromLevel);
   setAnimation(eepromAnimation);
-  setSpeed(eepromSpeed);
+  setAnimationSpeed(eepromSpeed);
   _mqtt->publishState(_subtopicLevel, String(eepromLevel));
   _mqtt->publishState(_subtopicAnimation, String(eepromAnimation));
   _mqtt->publishState(_subtopicSpeed, String(eepromSpeed));
@@ -77,7 +82,7 @@ void LedSegment::callback(String receivedMessageTopic, String newValueString) {
       EEPROM.commit();
     }
     _mqtt->publishState(_subtopicSpeed, String(newValue));
-    setSpeed(newValue);
+    setAnimationSpeed(newValue);
   } else
     return;
 
@@ -96,7 +101,7 @@ void LedSegment::setAnimation(byte newValue) {
   // TODO set LEDs.
 }
 
-void LedSegment::setSpeed(byte newValue) {
+void LedSegment::setAnimationSpeed(byte newValue) {
   _speed = newValue;
   // TODO set LEDs.
 }

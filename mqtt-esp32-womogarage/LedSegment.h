@@ -24,7 +24,7 @@ class LedSegment {
     void restoreFromEepromAndPublish();
     void setLevel(byte newValue);
     void setAnimation(byte newValue);
-    void setSpeed(byte newValue);
+    void setAnimationSpeed(byte newValue);
 
   public:
     void begin(int firstLed, int ledOffset, String subtopic, int memoryAddress, MqttPubSub* mqtt);

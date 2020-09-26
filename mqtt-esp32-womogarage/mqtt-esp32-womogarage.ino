@@ -116,7 +116,7 @@ LedSegment ledSegments[LedSegmentCount];
 
 void initLedSegments() {
   for (byte i=0; i<LedSegmentCount; i++)
-    ledSegments[i].begin(LedSegmentLedOffsets[i], LedSegmentLedCounts[i], DigitalStateOutputTopics[i], DigitalStateOutputMemoryAddresses[i], &mqtt);
+    ledSegments[i].begin(LedSegmentLedOffsets[i], LedSegmentLedCounts[i], LedSegmentTopics[i], LedSegmentMemoryAddresses[i], &mqtt);
 }
 
 void callbackLedSegments(String messageTopic, String newState) {
