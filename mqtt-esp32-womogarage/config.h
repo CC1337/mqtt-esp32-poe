@@ -41,7 +41,10 @@ const char* MqttPassword = NULL;
 #define BWM_VORGARTEN_SUBTOPIC "BewegungsmelderVorgarten"
 #define BWM_GARTEN_SUBTOPIC "BewegungsmelderGarten"
 #define VORGARTEN_STRAHLER_SUBTOPIC "StrahlerVorgarten"
-#define WOHNMOBIL_STECKDOSE "WohnmobilSteckdose"
+#define WOHNMOBIL_STECKDOSE_SUBTOPIC "WohnmobilSteckdose"
+#define LED_VG_VERT_1_SUBTOPIC "LedVorgartenVertikal1"
+#define LED_VG_VERT_2_SUBTOPIC "LedVorgartenVertikal2"
+#define LED_VG_VERT_3_SUBTOPIC "LedVorgartenVertikal3"
 
 
 /*
@@ -58,10 +61,13 @@ const char* MqttPassword = NULL;
  * ---------- FLASH MEMORY ----------
  */
 
-#define EEPROM_SIZE 10
+#define EEPROM_SIZE 20
 
-#define VORGARTEN_STRAHLER_MEMORY_ADDRESS 1
-#define WOHNMOBIL_STECKDOSE_MEMORY_ADDRESS 2
+#define VORGARTEN_STRAHLER_MEMORY_ADDRESS 1   // 1 byte needed
+#define WOHNMOBIL_STECKDOSE_MEMORY_ADDRESS 2  // 1 byte needed
+#define LED_VG_VERT_1_MEMORY_ADDRESS 3        // 3 byte needed
+#define LED_VG_VERT_2_MEMORY_ADDRESS 6        // 3 byte needed
+#define LED_VG_VERT_3_MEMORY_ADDRESS 9        // 3 byte needed
 
 
 /*
@@ -101,6 +107,38 @@ const byte MotionSensorPins[MotionSensorCount] =
 {
   BWM_VORGARTEN_PIN,
   BWM_GARTEN_PIN
+};
+
+
+/*
+ * ---------- LED SEGMENTS ----------
+ */
+
+const byte LedSegmentCount = 3;
+const char LedSegmentTopicss[LedSegmentCount][TOPIC_MAX_LENGTH] =
+{
+  LED_VG_VERT_3_SUBTOPIC,
+  LED_VG_VERT_2_SUBTOPIC,
+  LED_VG_VERT_1_SUBTOPIC
+};
+const byte LedSegmentLedOffsets[LedSegmentCount] =
+{
+  0,
+  10,
+  20
+};
+const byte LedSegmentLedCounts[LedSegmentCount] =
+{
+  10,
+  10,
+  10
+};
+// 3 byte needed for each
+const byte LedSegmentMemoryAddresses[LedSegmentCount] =
+{
+  LED_VG_VERT_3_MEMORY_ADDRESS,
+  LED_VG_VERT_2_MEMORY_ADDRESS,
+  LED_VG_VERT_1_MEMORY_ADDRESS
 };
 
 
