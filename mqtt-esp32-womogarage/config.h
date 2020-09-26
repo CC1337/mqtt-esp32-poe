@@ -72,13 +72,14 @@ const byte DigitalStateOutputCount = 2;
 const char DigitalStateOutputTopics[DigitalStateOutputCount][TOPIC_MAX_LENGTH] =
 {
   VORGARTEN_STRAHLER_SUBTOPIC,
-  WOHNMOBIL_STECKDOSE
+  WOHNMOBIL_STECKDOSE_SUBTOPIC
 };
 const byte DigitalStateOutputPins[DigitalStateOutputCount] =
 {
   VORGARTEN_STRAHLER_PIN,
   WOHNMOBIL_STECKDOSE_PIN
 };
+// 1 byte needed for each
 const byte DigitalStateOutputMemoryAddresses[DigitalStateOutputCount] =
 {
   VORGARTEN_STRAHLER_MEMORY_ADDRESS,

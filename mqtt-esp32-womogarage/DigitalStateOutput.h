@@ -13,7 +13,6 @@ class DigitalStateOutput {
     String _subtopicGet;
     int _memoryAddress;
     MqttPubSub* _mqtt;
-  	bool _lastVal = HIGH;
     void restoreFromEepromAndPublish();
 
   public:
