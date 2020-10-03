@@ -83,6 +83,10 @@ void InfoLed::setState(byte newState) {
       _blinkDelay = 250;
       _blinkLength = 100;
       break;
+    default:
+      _blinkDelay = 0;
+      _blinkLength = 0;
+      break;
   }
   
   digitalWrite(_pin, newState != 0);
