@@ -3,8 +3,9 @@
 
 extern String bool2Str(bool buhl);
 
-void DigitalStateOutput::begin(byte pin, String subtopic, int memoryAddress, MqttPubSub* mqtt) {
+void DigitalStateOutput::begin(byte pin, bool inverted, String subtopic, int memoryAddress, MqttPubSub* mqtt) {
   _pin = pin;
+  _inverted = inverted;
   _subtopic = subtopic;
   _subtopicSet = subtopic + "/setState";
   _subtopicGet = subtopic + "/state";
@@ -19,8 +20,12 @@ void DigitalStateOutput::begin(byte pin, String subtopic, int memoryAddress, Mqt
 
 void DigitalStateOutput::restoreFromEepromAndPublish() {
   bool eepromState = (bool)EEPROM.read(_memoryAddress);
-  digitalWrite(_pin, eepromState);
+  setOutput(eepromState);
   _mqtt->publishState(_subtopicSet,  bool2Str(digitalRead(_pin)));
+}
+
+void DigitalStateOutput::setOutput(bool newState) {
+  digitalWrite(_pin, _inverted ? !newState : newState);
 }
 
 void DigitalStateOutput::callback(String receivedMessageTopic, String newState) {
@@ -45,7 +50,7 @@ void DigitalStateOutput::callback(String receivedMessageTopic, String newState) 
       EEPROM.write(_memoryAddress, (byte)targetState);
       EEPROM.commit();
     }
-    digitalWrite(_pin, targetState);
+    setOutput(targetState);
     _mqtt->publishState(_subtopicGet, bool2Str(targetState));
   }
 }

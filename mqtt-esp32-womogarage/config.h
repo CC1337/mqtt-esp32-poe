@@ -85,6 +85,11 @@ const byte DigitalStateOutputPins[DigitalStateOutputCount] =
   VORGARTEN_STRAHLER_PIN,
   WOHNMOBIL_STECKDOSE_PIN
 };
+const byte DigitalStateOutputInverted[DigitalStateOutputCount] =
+{
+  true,
+  false
+};
 // 1 byte needed for each
 const byte DigitalStateOutputMemoryAddresses[DigitalStateOutputCount] =
 {

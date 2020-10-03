@@ -80,6 +80,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
   callbackLedSegments(String(topic), payloadString);
 }
 
+
 // MOTION SENSORS
 
 MotionSensor motionSensors[MotionSensorCount];
@@ -94,13 +95,14 @@ void checkMotionSensors() {
     motionSensors[i].check();
 }
 
+
 // DIGITAL STATE OUTPUTS
 
 DigitalStateOutput digitalStateOutputs[DigitalStateOutputCount];
 
 void initDigitalStateOutputs() {
   for (byte i=0; i<DigitalStateOutputCount; i++)
-    digitalStateOutputs[i].begin(DigitalStateOutputPins[i], DigitalStateOutputTopics[i], DigitalStateOutputMemoryAddresses[i], &mqtt);
+    digitalStateOutputs[i].begin(DigitalStateOutputPins[i], DigitalStateOutputInverted[i], DigitalStateOutputTopics[i], DigitalStateOutputMemoryAddresses[i], &mqtt);
 }
 
 void callbackDigitalStateOutputs(String messageTopic, String newState) {
