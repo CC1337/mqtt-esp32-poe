@@ -30,15 +30,15 @@ void DigitalStateOutput::callback(String receivedMessageTopic, String newState) 
   if(_pin == 0)
     return;
 
-  bool targetState;
-  if (newState == "true" || newState == "1")
-    targetState = true;
-  else if (newState == "false" || newState == "0")
-    targetState = false;
-  else
-    return;
-
   if (receivedMessageTopic.endsWith(_subtopic)) {
+
+    bool targetState;
+    if (newState == "true" || newState == "1")
+      targetState = true;
+    else if (newState == "false" || newState == "0")
+      targetState = false;
+    else
+      return;
 
     if (targetState == _inverted ? !digitalRead(_pin) : digitalRead(_pin))
       return;
