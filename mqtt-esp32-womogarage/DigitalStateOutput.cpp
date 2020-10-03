@@ -19,7 +19,7 @@ void DigitalStateOutput::begin(byte pin, bool inverted, String subtopic, int mem
 void DigitalStateOutput::restoreFromEepromAndPublish() {
   bool eepromState = (bool)EEPROM.read(_memoryAddress);
   setOutput(eepromState);
-  _mqtt->publishState(_subtopic,  bool2Str(digitalRead(_pin)));
+  _mqtt->publishState(_subtopic,  bool2Str(eepromState));
 }
 
 void DigitalStateOutput::setOutput(bool newState) {
