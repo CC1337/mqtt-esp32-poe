@@ -10,8 +10,6 @@ class DigitalStateOutput {
   	byte _pin = 0;
     bool _inverted;
     String _subtopic;
-    String _subtopicSet;
-    String _subtopicGet;
     int _memoryAddress;
     MqttPubSub* _mqtt;
     void restoreFromEepromAndPublish();

@@ -7,13 +7,11 @@ void DigitalStateOutput::begin(byte pin, bool inverted, String subtopic, int mem
   _pin = pin;
   _inverted = inverted;
   _subtopic = subtopic;
-  _subtopicSet = subtopic + "/setState";
-  _subtopicGet = subtopic + "/state";
   _mqtt = mqtt;
   _memoryAddress = memoryAddress;
   pinMode(_pin, OUTPUT);
 
-  _mqtt->subscribe(_subtopicSet);
+  _mqtt->subscribe(_subtopic);
   restoreFromEepromAndPublish();
 
 }
@@ -21,7 +19,7 @@ void DigitalStateOutput::begin(byte pin, bool inverted, String subtopic, int mem
 void DigitalStateOutput::restoreFromEepromAndPublish() {
   bool eepromState = (bool)EEPROM.read(_memoryAddress);
   setOutput(eepromState);
-  _mqtt->publishState(_subtopicSet,  bool2Str(digitalRead(_pin)));
+  _mqtt->publishState(_subtopic,  bool2Str(digitalRead(_pin)));
 }
 
 void DigitalStateOutput::setOutput(bool newState) {
@@ -40,9 +38,12 @@ void DigitalStateOutput::callback(String receivedMessageTopic, String newState) 
   else
     return;
 
-  if (receivedMessageTopic.endsWith(_subtopicSet)) {
+  if (receivedMessageTopic.endsWith(_subtopic)) {
 
-    Serial.print(_subtopicSet);
+    if (targetState == _inverted ? !digitalRead(_pin) : digitalRead(_pin))
+      return;
+
+    Serial.print(_subtopic);
     Serial.print(F(" = "));
     Serial.println(targetState);
 
@@ -51,6 +52,6 @@ void DigitalStateOutput::callback(String receivedMessageTopic, String newState) 
       EEPROM.commit();
     }
     setOutput(targetState);
-    _mqtt->publishState(_subtopicGet, bool2Str(targetState));
+    _mqtt->publishState(_subtopic, bool2Str(targetState));
   }
 }
