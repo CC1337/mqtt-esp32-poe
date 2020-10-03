@@ -5,6 +5,7 @@
 #include "MqttPubSub.h"
 #include "MotionSensor.h"
 #include "DigitalStateOutput.h"
+#include "InfoLed.h"
 #include "LedSegment.h"
 
 #define ETH_CLK_MODE ETH_CLOCK_GPIO17_OUT
@@ -77,6 +78,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
   Serial.println();
 
   callbackDigitalStateOutputs(String(topic), payloadString);
+  callbackInfoLeds(String(topic), payloadString);
   callbackLedSegments(String(topic), payloadString);
 }
 
@@ -109,6 +111,27 @@ void callbackDigitalStateOutputs(String messageTopic, String newState) {
   for (byte i=0; i<DigitalStateOutputCount; i++) {
     digitalStateOutputs[i].callback(messageTopic, newState);
   }
+}
+
+
+// INFO LEDS
+
+InfoLed infoLeds[InfoLedCount];
+
+void initInfoLeds() {
+  for (byte i=0; i<InfoLedCount; i++)
+    infoLeds[i].begin(InfoLedPins[i], InfoLedTopics[i], InfoLedMemoryAddresses[i], &mqtt);
+}
+
+void callbackInfoLeds(String messageTopic, String newState) {
+  for (byte i=0; i<InfoLedCount; i++) {
+    infoLeds[i].callback(messageTopic, newState);
+  }
+}
+
+void checkInfoLeds() {
+  for (byte i=0; i<InfoLedCount; i++)
+    infoLeds[i].check();
 }
 
 
@@ -171,6 +194,7 @@ void loop()
       mqttClient.loop();
       healthPing(false);
       checkMotionSensors();
+      checkInfoLeds();
     }
   }
 }
@@ -199,6 +223,7 @@ void reconnect() {
 void initialMqttInit() {
   publishInitialStatus();
   initDigitalStateOutputs();
+  initInfoLeds();
   initLedSegments();
 }
 

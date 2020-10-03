@@ -45,6 +45,8 @@ const char* MqttPassword = NULL;
 #define LED_VG_VERT_1_SUBTOPIC "LedVorgartenVertikal1"
 #define LED_VG_VERT_2_SUBTOPIC "LedVorgartenVertikal2"
 #define LED_VG_VERT_3_SUBTOPIC "LedVorgartenVertikal3"
+#define LED_TASTER_LICHT_VORGARTEN_SUBTOPIC "LedTasterLichtVorgarten"
+#define LED_TASTER_STECKDOSE_WOHNMOBIL_SUBTOPIC "LedTasterWohnmobilSteckdose"
 
 
 /*
@@ -55,6 +57,8 @@ const char* MqttPassword = NULL;
 #define BWM_GARTEN_PIN 5
 #define VORGARTEN_STRAHLER_PIN 13
 #define WOHNMOBIL_STECKDOSE_PIN 14
+#define LED_TASTER_LICHT_VORGARTEN_PIN 15
+#define LED_TASTER_STECKDOSE_WOHNMOBIL_PIN 16
 
 
 /*
@@ -63,15 +67,16 @@ const char* MqttPassword = NULL;
 
 #define EEPROM_SIZE 20
 
-#define VORGARTEN_STRAHLER_MEMORY_ADDRESS 1   // 1 byte needed
-#define WOHNMOBIL_STECKDOSE_MEMORY_ADDRESS 2  // 1 byte needed
-#define LED_VG_VERT_1_MEMORY_ADDRESS 3        // 3 byte needed
-#define LED_VG_VERT_2_MEMORY_ADDRESS 6        // 3 byte needed
-#define LED_VG_VERT_3_MEMORY_ADDRESS 9        // 3 byte needed
-
+#define VORGARTEN_STRAHLER_MEMORY_ADDRESS 1               // 1 byte needed
+#define WOHNMOBIL_STECKDOSE_MEMORY_ADDRESS 2              // 1 byte needed
+#define LED_VG_VERT_1_MEMORY_ADDRESS 3                    // 3 byte needed
+#define LED_VG_VERT_2_MEMORY_ADDRESS 6                    // 3 byte needed
+#define LED_VG_VERT_3_MEMORY_ADDRESS 9                    // 3 byte needed
+#define LED_TASTER_LICHT_VORGARTEN_MEMORY_ADDRESS 10      // 1 byte needed
+#define LED_TASTER_STECKDOSE_WOHNMOBIL_MEMORY_ADDRESS 11  // 1 byte needed
 
 /*
- * ---------- OUTPUTSTATE TOPIC ASSIGNMENTS ----------
+ * ---------- DIGITALSTATEOUTPUT TOPIC ASSIGNMENTS ----------
  */
 
 const byte DigitalStateOutputCount = 2;
@@ -95,6 +100,29 @@ const byte DigitalStateOutputMemoryAddresses[DigitalStateOutputCount] =
 {
   VORGARTEN_STRAHLER_MEMORY_ADDRESS,
   WOHNMOBIL_STECKDOSE_MEMORY_ADDRESS
+};
+
+
+/*
+ * ---------- INFOLED TOPIC ASSIGNMENTS ----------
+ */
+
+const byte InfoLedCount = 2;
+const char InfoLedTopics[DigitalStateOutputCount][TOPIC_MAX_LENGTH] =
+{
+  LED_TASTER_LICHT_VORGARTEN_SUBTOPIC,
+  LED_TASTER_STECKDOSE_WOHNMOBIL_SUBTOPIC
+};
+const byte InfoLedPins[InfoLedCount] =
+{
+  LED_TASTER_LICHT_VORGARTEN_PIN,
+  LED_TASTER_STECKDOSE_WOHNMOBIL_PIN
+};
+// 1 byte needed for each
+const byte InfoLedMemoryAddresses[InfoLedCount] =
+{
+  LED_TASTER_LICHT_VORGARTEN_MEMORY_ADDRESS,
+  LED_TASTER_STECKDOSE_WOHNMOBIL_MEMORY_ADDRESS
 };
 
 
