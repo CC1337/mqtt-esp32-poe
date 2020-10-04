@@ -4,6 +4,7 @@
 #include "config.h"
 #include "MqttPubSub.h"
 #include "MotionSensor.h"
+#include "Button.h"
 #include "DigitalStateOutput.h"
 #include "InfoLed.h"
 #include "LedSegment.h"
@@ -98,6 +99,21 @@ void checkMotionSensors() {
 }
 
 
+// BUTTONS
+
+Button buttons[ButtonCount];
+
+void initButtons() {
+  for (byte i=0; i<ButtonCount; i++)
+    buttons[i].begin(ButtonPins[i], ButtonTopics[i], &mqtt);
+}
+
+void checkButtons() {
+  for (byte i=0; i<ButtonCount; i++)
+    buttons[i].check();
+}
+
+
 // DIGITAL STATE OUTPUTS
 
 DigitalStateOutput digitalStateOutputs[DigitalStateOutputCount];
@@ -174,8 +190,6 @@ void setup()
   ETH.begin();
   ETH.config(local_IP, gateway, subnet, gateway, gateway);
   
-  initMotionSensors();
- 
   Serial.println(F("Ready"));
 }
 
@@ -194,6 +208,7 @@ void loop()
       mqttClient.loop();
       healthPing(false);
       checkMotionSensors();
+      checkButtons();
       checkInfoLeds();
     }
   }
@@ -222,6 +237,8 @@ void reconnect() {
 
 void initialMqttInit() {
   publishInitialStatus();
+  initMotionSensors();
+  initButtons();
   initDigitalStateOutputs();
   initInfoLeds();
   initLedSegments();

@@ -47,18 +47,22 @@ const char* MqttPassword = NULL;
 #define LED_VG_VERT_3_SUBTOPIC "LedVorgartenVertikal3"
 #define LED_TASTER_LICHT_VORGARTEN_SUBTOPIC "LedTasterLichtVorgarten"
 #define LED_TASTER_STECKDOSE_WOHNMOBIL_SUBTOPIC "LedTasterWohnmobilSteckdose"
+#define TASTER_LICHT_VORGARTEN_SUBTOPIC "TasterLichtVorgarten"
+#define TASTER_STECKDOSE_WOHNMOBIL_SUBTOPIC "TasterWohnmobilSteckdose"
 
 
 /*
  * ---------- PINS ----------
  */
 
-#define BWM_VORGARTEN_PIN 4
-#define BWM_GARTEN_PIN 5
-#define VORGARTEN_STRAHLER_PIN 13
-#define WOHNMOBIL_STECKDOSE_PIN 14
-#define LED_TASTER_LICHT_VORGARTEN_PIN 15
-#define LED_TASTER_STECKDOSE_WOHNMOBIL_PIN 16
+#define BWM_VORGARTEN_PIN 32
+#define BWM_GARTEN_PIN 33
+#define VORGARTEN_STRAHLER_PIN 15
+#define WOHNMOBIL_STECKDOSE_PIN 16
+#define LED_TASTER_LICHT_VORGARTEN_PIN 4
+#define LED_TASTER_STECKDOSE_WOHNMOBIL_PIN 5
+#define TASTER_LICHT_VORGARTEN_PIN 13
+#define TASTER_STECKDOSE_WOHNMOBIL_PIN 14
 
 
 /*
@@ -92,8 +96,8 @@ const byte DigitalStateOutputPins[DigitalStateOutputCount] =
 };
 const byte DigitalStateOutputInverted[DigitalStateOutputCount] =
 {
-  true,
-  false
+  false,
+  true
 };
 // 1 byte needed for each
 const byte DigitalStateOutputMemoryAddresses[DigitalStateOutputCount] =
@@ -140,6 +144,23 @@ const byte MotionSensorPins[MotionSensorCount] =
 {
   BWM_VORGARTEN_PIN,
   BWM_GARTEN_PIN
+};
+
+
+/*
+ * ---------- BUTTON TOPIC ASSIGNMENTS ----------
+ */
+
+const byte ButtonCount = 2;
+const char ButtonTopics[ButtonCount][TOPIC_MAX_LENGTH] =
+{
+  TASTER_LICHT_VORGARTEN_SUBTOPIC,
+  TASTER_STECKDOSE_WOHNMOBIL_SUBTOPIC
+};
+const byte ButtonPins[ButtonCount] =
+{
+  TASTER_LICHT_VORGARTEN_PIN,
+  TASTER_STECKDOSE_WOHNMOBIL_PIN
 };
 
 
