@@ -235,7 +235,7 @@ void publishInitialStatus() {
 }
 
 void healthPing(bool force) {
-  if (millis()-lastHealthPing < HealthPingDelayMs && !force)
+  if (millis()-lastHealthPing < HEALTH_PING_DELAY_MS && !force)
     return;
   lastHealthPing = millis();
   Serial.println(F("Starting health ping... "));

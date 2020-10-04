@@ -23,7 +23,8 @@ class InfoLed {
     MqttPubSub* _mqtt;
     const char *_states[INFOLED_NUM_STATES] = {INFOLED_STATE_OFF, INFOLED_STATE_ON, INFOLED_STATE_BLINK, INFOLED_STATE_BLINK_SLOW, INFOLED_STATE_BLINK_FAST};
     const byte _numStates = INFOLED_NUM_STATES;
-    byte _state = 0;    void restoreFromEepromAndPublish();
+    byte _state = 0;
+    void restoreFromEepromAndPublish();
     unsigned long _lastBlinkStart = 0;
     int _blinkDelay = 0;
     int _blinkLength = 0;

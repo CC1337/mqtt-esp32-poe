@@ -180,7 +180,6 @@ const byte LedSegmentMemoryAddresses[LedSegmentCount] =
  */
 
 // Health Ping
-#define HealthPingDelayMs 60000
-
+#define HEALTH_PING_DELAY_MS 60000
 
 #endif

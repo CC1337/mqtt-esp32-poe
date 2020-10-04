@@ -1,8 +1,6 @@
 #include <EEPROM.h>
 #include "InfoLed.h"
 
-extern String bool2Str(bool buhl);
-
 void InfoLed::begin(byte pin, String subtopic, int memoryAddress, MqttPubSub* mqtt) {
   _pin = pin;
   _subtopic = subtopic;
