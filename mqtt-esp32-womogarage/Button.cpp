@@ -29,7 +29,7 @@ String Button::getPossibleStatesJsonArray() {
   return statesPossible;
 }
 
-void Button::check() {
+void Button::loop() {
   if (pressed()) {
     _lastReleaseStart = 0;
     if (_lastPressStart == 0) {

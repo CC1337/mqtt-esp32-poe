@@ -9,7 +9,7 @@ void MotionSensor::begin(byte pin, String subtopic, MqttPubSub* mqtt) {
   pinMode(_pin, INPUT);
 }
 
-void MotionSensor::check() {
+void MotionSensor::loop() {
   if(_pin == 0)
     return;
   

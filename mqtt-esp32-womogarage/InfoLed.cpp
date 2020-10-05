@@ -50,7 +50,7 @@ byte InfoLed::state2Number(String state) {
   return 0;
 }
 
-void InfoLed::check() {
+void InfoLed::loop() {
   if (_blinkDelay == 0 || _blinkLength == 0)
     return;
 

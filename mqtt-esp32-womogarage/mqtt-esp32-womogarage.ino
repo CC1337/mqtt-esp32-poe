@@ -44,9 +44,9 @@ void initMotionSensors() {
     motionSensors[i].begin(MotionSensorPins[i], MotionSensorTopics[i], &mqtt);
 }
 
-void checkMotionSensors() {
+void loopMotionSensors() {
   for (byte i=0; i<MotionSensorCount; i++)
-    motionSensors[i].check();
+    motionSensors[i].loop();
 }
 
 
@@ -59,9 +59,9 @@ void initButtons() {
     buttons[i].begin(ButtonPins[i], ButtonTopics[i], &mqtt);
 }
 
-void checkButtons() {
+void loopButtons() {
   for (byte i=0; i<ButtonCount; i++)
-    buttons[i].check();
+    buttons[i].loop();
 }
 
 
@@ -96,9 +96,9 @@ void callbackInfoLeds(String messageTopic, String newState) {
   }
 }
 
-void checkInfoLeds() {
+void loopInfoLeds() {
   for (byte i=0; i<InfoLedCount; i++)
-    infoLeds[i].check();
+    infoLeds[i].loop();
 }
 
 
@@ -131,9 +131,9 @@ void afterMqttInit() {
 
 // Put methods here that should be called every main loop cycle while MQTT is connected
 void everyLoop() {
-  checkMotionSensors();
-  checkButtons();
-  checkInfoLeds();
+  loopMotionSensors();
+  loopButtons();
+  loopInfoLeds();
 }
 
 // Put callbacks here that will receive all MQTT messages below the configured MqttTopic from config.h

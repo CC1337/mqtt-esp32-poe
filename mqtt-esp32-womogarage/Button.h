@@ -38,7 +38,7 @@ class Button {
 
   public:
     void begin(byte pin, String subtopic, MqttPubSub* mqtt);
-    void check();
+    void loop();
 };
 
 #endif
