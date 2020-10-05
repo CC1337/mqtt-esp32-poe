@@ -37,6 +37,10 @@ void LedSegment::restoreFromEepromAndPublish() {
   _mqtt->publishState(_subtopicSpeed, String(eepromSpeed));
 }
 
+void LedSegment::loop() {
+  // TODO do animations
+}
+
 void LedSegment::callback(String receivedMessageTopic, String newValueString) {
   if(_ledCount == 0)
     return;

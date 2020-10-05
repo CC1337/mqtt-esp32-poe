@@ -107,9 +107,15 @@ void loopInfoLeds() {
 
 // LED SEGMENTS
 
+AddressableLeds leds;
 LedSegment ledSegments[LedSegmentCount];
 
+void initAddressableLeds() {
+  leds.begin(ADDRESSABLE_LED_PIN, ADDRESSABLE_LED_COUNT);
+}
+
 void initLedSegments() {
+  initAddressableLeds();
   for (byte i=0; i<LedSegmentCount; i++)
     ledSegments[i].begin(LedSegmentLedOffsets[i], LedSegmentLedCounts[i], LedSegmentTopics[i], LedSegmentMemoryAddresses[i], &mqtt);
 }
@@ -119,6 +125,14 @@ void callbackLedSegments(String messageTopic, String newState) {
     ledSegments[i].callback(messageTopic, newState);
   }
 }
+
+void loopLedSegments() {
+  for (byte i=0; i<LedSegmentCount; i++) {
+    ledSegments[i].loop();
+  }
+  leds.show();
+}
+
 
 
 // ------------------------------------ MODULES HOOKUP POINTS ------------------------------------
@@ -137,6 +151,7 @@ void everyLoop() {
   loopMotionSensors();
   loopButtons();
   loopInfoLeds();
+  loopLedSegments();
 }
 
 // Put callbacks here that will receive all MQTT messages below the configured MqttTopic from config.h

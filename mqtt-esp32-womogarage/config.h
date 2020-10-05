@@ -64,6 +64,7 @@
 #define LED_TASTER_STECKDOSE_WOHNMOBIL_PIN 5
 #define TASTER_LICHT_VORGARTEN_PIN 13
 #define TASTER_STECKDOSE_WOHNMOBIL_PIN 14
+#define ADDRESSABLE_LED_PIN 2
 
 
 /*
@@ -79,6 +80,13 @@
 #define LED_VG_VERT_3_MEMORY_ADDRESS 9                    // 3 byte needed
 #define LED_TASTER_LICHT_VORGARTEN_MEMORY_ADDRESS 10      // 1 byte needed
 #define LED_TASTER_STECKDOSE_WOHNMOBIL_MEMORY_ADDRESS 11  // 1 byte needed
+
+
+/*
+ * ---------- ADDRESSABLE LEDS ----------
+ */
+
+#define ADDRESSABLE_LED_COUNT 60
 
 
 /*

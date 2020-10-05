@@ -10,6 +10,7 @@
 #include "Button.h"
 #include "DigitalStateOutput.h"
 #include "InfoLed.h"
+#include "AddressableLeds.h"
 #include "LedSegment.h"
 
 
