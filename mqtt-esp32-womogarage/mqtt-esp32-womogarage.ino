@@ -92,35 +92,19 @@ void loopInfoLeds() {
 }
 
 
-// (ADDRESSABLE) LED SEGMENTS
-
-//CRGB leds[ADDRESSABLE_LED_COUNT];
-AddressableLeds leds;
-void initAddressableLeds() {
-  leds.begin(ADDRESSABLE_LED_DATA_PIN, ADDRESSABLE_LED_COUNT);
-}
-
-
-
-//FastLED.addLeds<ADDRESSABLE_LED_TYPE, ADDRESSABLE_LED_DATA_PIN>(leds, ADDRESSABLE_LED_COUNT);
-//FastLED.setBrightness(100);
+// LED SEGMENTS
 
 LedSegment ledSegments[LedSegmentCount];
 
 void initLedSegments() {
-  initAddressableLeds();
   for (byte i=0; i<LedSegmentCount; i++)
-    ledSegments[i].begin(LedSegmentLedOffsets[i], LedSegmentLedCounts[i], LedSegmentTopics[i], LedSegmentMemoryAddresses[i], &leds, &mqtt);
+    ledSegments[i].begin(LedSegmentLedOffsets[i], LedSegmentLedCounts[i], LedSegmentTopics[i], LedSegmentMemoryAddresses[i], &mqtt);
 }
 
 void callbackLedSegments(String messageTopic, String newState) {
   for (byte i=0; i<LedSegmentCount; i++) {
     ledSegments[i].callback(messageTopic, newState);
   }
-}
-
-void loopLedSegments() {
-  leds.show();
 }
 
 
@@ -140,7 +124,6 @@ void everyLoop() {
   loopMotionSensors();
   loopButtons();
   loopInfoLeds();
-  loopLedSegments();
 }
 
 // Put callbacks here that will receive all MQTT messages below the configured MqttTopic from config.h

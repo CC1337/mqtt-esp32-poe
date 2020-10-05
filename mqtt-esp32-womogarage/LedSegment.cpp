@@ -1,7 +1,7 @@
 #include <EEPROM.h>
 #include "LedSegment.h"
 
-void LedSegment::begin(int ledOffset, int ledCount, String subtopic, int memoryAddress, AddressableLeds* leds, MqttPubSub* mqtt) {
+void LedSegment::begin(int ledOffset, int ledCount, String subtopic, int memoryAddress, MqttPubSub* mqtt) {
   Serial.print("Init LedSegment - ledOffset: " + ledOffset);
   Serial.print(" | ledCount: " + ledCount);
   Serial.print(" | subtopic: " + subtopic);
@@ -13,7 +13,6 @@ void LedSegment::begin(int ledOffset, int ledCount, String subtopic, int memoryA
   _subtopicLevel = subtopic + "/level";
   _subtopicAnimation = subtopic + "/animation";
   _subtopicSpeed = subtopic + "/speed";
-  _leds = leds;
   _mqtt = mqtt;
   _memoryAddress = memoryAddress;
   _memoryAddressLevel = memoryAddress;

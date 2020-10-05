@@ -1,6 +1,5 @@
 #include <Arduino.h>
 #include "MqttPubSub.h"
-#include "AddressableLeds.h"
 
 #ifndef LedSegment_h
 #define LedSegment_h
@@ -22,14 +21,13 @@ class LedSegment {
     byte _animation;
     byte _speed;
     MqttPubSub* _mqtt;
-    AddressableLeds* _leds;
     void restoreFromEepromAndPublish();
     void setLevel(byte newValue);
     void setAnimation(byte newValue);
     void setAnimationSpeed(byte newValue);
 
   public:
-    void begin(int firstLed, int ledOffset, String subtopic, int memoryAddress, AddressableLeds* leds, MqttPubSub* mqtt);
+    void begin(int firstLed, int ledOffset, String subtopic, int memoryAddress, MqttPubSub* mqtt);
     void callback(String receivedMessageTopic, String newValue);
 };
 
