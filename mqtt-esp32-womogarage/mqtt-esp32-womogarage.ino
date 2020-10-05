@@ -1,3 +1,10 @@
+/*
+ * This sketch was written for Olimex ESP32-POE.
+ * Various sensors or actuators can be connected to be integrated into your smart home using MQTT (which integrates easily into f.e. ioBroker using the MQTT adapter.
+ * 
+ * MQTT and ETH setup based on https://github.com/zorce/ESP32-POE_MQTT_example/blob/master/ESP32-POE_MQTT.ino
+ */
+
 #include <EEPROM.h>
 #include <WiFiClient.h>
 #include <PubSubClient.h>
@@ -26,63 +33,7 @@ unsigned long lastHealthPing = millis();
 boolean mqttHasBeenInitializedBefore = false;
 
 
-String bool2Str(bool buhl) {
-  return buhl ? "true" : "false";
-}
-
-void WiFiEvent(WiFiEvent_t event)
-{
-  switch (event) {
-    case SYSTEM_EVENT_ETH_START:
-      Serial.println("ETH Started");
-      //set eth hostname here
-      ETH.setHostname(MqttTopic);
-      break;
-    case SYSTEM_EVENT_ETH_CONNECTED:
-      Serial.println("ETH Connected");
-      break;
-    case SYSTEM_EVENT_ETH_GOT_IP:
-      Serial.print("ETH MAC: ");
-      Serial.print(ETH.macAddress());
-      Serial.print(", IPv4: ");
-      Serial.print(ETH.localIP());
-      if (ETH.fullDuplex()) {
-        Serial.print(", FULL_DUPLEX");
-      }
-      Serial.print(", ");
-      Serial.print(ETH.linkSpeed());
-      Serial.println("Mbps");
-      eth_connected = true;
-      break;
-    case SYSTEM_EVENT_ETH_DISCONNECTED:
-      Serial.println("ETH Disconnected");
-      eth_connected = false;
-      break;
-    case SYSTEM_EVENT_ETH_STOP:
-      Serial.println("ETH Stopped");
-      eth_connected = false;
-      break;
-    default:
-      break;
-  }
-}
-
-void callback(char* topic, byte* payload, unsigned int length) {
-  Serial.print("Message arrived [");
-  Serial.print(topic);
-  Serial.print("] ");
-  String payloadString;
-  for (int i=0;i<length;i++) {
-    Serial.print((char)payload[i]);
-    payloadString.concat((char)payload[i]);
-  }
-  Serial.println();
-
-  callbackDigitalStateOutputs(String(topic), payloadString);
-  callbackInfoLeds(String(topic), payloadString);
-  callbackLedSegments(String(topic), payloadString);
-}
-
+// ------------------------------------ MODULES SETUP ------------------------------------
 
 // MOTION SENSORS
 
@@ -167,6 +118,32 @@ void callbackLedSegments(String messageTopic, String newState) {
 }
 
 
+// ------------------------------------ MODULES HOOKUP POINTS ------------------------------------
+
+// Put initialization of modules that might need MQTT reference here to make sure it's ready
+void afterMqttInit() {
+  initMotionSensors();
+  initButtons();
+  initDigitalStateOutputs();
+  initInfoLeds();
+  initLedSegments();
+}
+
+// Put methods here that should be called every main loop cycle while MQTT is connected
+void everyLoop() {
+  checkMotionSensors();
+  checkButtons();
+  checkInfoLeds();
+}
+
+// Put callbacks here that will receive all MQTT messages below the configured MqttTopic from config.h
+void moduleMqttCallbacks(String messageTopic, String payload) {
+  callbackDigitalStateOutputs(messageTopic, payload);
+  callbackInfoLeds(messageTopic, payload);
+  callbackLedSegments(messageTopic, payload);
+}
+
+
 // ------------------------------------ SETUP ------------------------------------
 
 void setup()
@@ -178,7 +155,7 @@ void setup()
   EEPROM.begin(EEPROM_SIZE);
 
   mqttClient.setServer(MqttServerIp, MqttServerPort);
-  mqttClient.setCallback(callback);
+  mqttClient.setCallback(mqttCallback);
   mqtt.begin(&mqttClient, String(MqttTopic));
 
   chipid=ESP.getEfuseMac();//The chip ID is essentially its MAC address(length: 6 bytes).
@@ -196,54 +173,60 @@ void setup()
 
 // ------------------------------------ LOOP ------------------------------------
 
-
 void loop()
 {
-  // check if ethernet is connected
   if (eth_connected) {
-    // now take care of MQTT client...
     if (!mqttClient.connected()) {
-      reconnect();
+      mqttReconnect();
     } else {
       mqttClient.loop();
       healthPing(false);
-      checkMotionSensors();
-      checkButtons();
-      checkInfoLeds();
+      everyLoop();
     }
   }
 }
 
-void reconnect() {
-  // Loop until we're reconnected
+
+// ------------------------------------ BASIC FUNCTIONS ------------------------------------
+
+// As this device needs to be connected because all functionality depends on MQTT, this method id blocking if not connected
+void mqttReconnect() {
   while (!mqttClient.connected()) {
-    Serial.print("Attempting MQTT connection...");
-    // Attempt to connect
+    Serial.print(F("Starting MQTT connection..."));
     if (mqttClient.connect(MqttClientName)) {
-    //if (mqttClient.connect(MqttClientName, MqttUsername, MqttPassword) { // if credentials is needed
-      Serial.println("connected");
-      if (!mqttHasBeenInitializedBefore)
-        initialMqttInit();
+    //if (mqttClient.connect(MqttClientName, MqttUsername, MqttPassword) { // optional with credentials
+      Serial.println(F(" connected."));
+      if (!mqttHasBeenInitializedBefore) {
+          publishInitialStatus();
+          afterMqttInit();
+      }
       mqttHasBeenInitializedBefore = true;
     } else {
-      Serial.print("failed, rc=");
+      Serial.print(F(" failed, rc="));
       Serial.print(mqttClient.state());
-      Serial.println(" try again in 5 seconds");
-      // Wait 5 seconds before retrying
+      Serial.println(F(" will try again in 5 seconds"));
+
       delay(5000);
     }
   }
 }
 
-void initialMqttInit() {
-  publishInitialStatus();
-  initMotionSensors();
-  initButtons();
-  initDigitalStateOutputs();
-  initInfoLeds();
-  initLedSegments();
+// Every message to a topic we subscribed to will end up here, logged and forwarded to moduleMqttCallbacks
+void mqttCallback(char* topic, byte* payload, unsigned int length) {
+  Serial.print("Message arrived [");
+  Serial.print(topic);
+  Serial.print("] ");
+  String payloadString;
+  for (int i=0;i<length;i++) {
+    Serial.print((char)payload[i]);
+    payloadString.concat((char)payload[i]);
+  }
+  Serial.println();
+
+  moduleMqttCallbacks(String(topic), payloadString);
 }
 
+// On boot, publish IP
 void publishInitialStatus() {
   String onlineText = String(MqttTopic);
   onlineText.concat(" online.");
@@ -251,6 +234,7 @@ void publishInitialStatus() {
   healthPing(true);
 }
 
+// Every HEALTH_PING_DELAY_MS ms (config.h), there will be a message with random number to be able monitoring the online state of this device
 void healthPing(bool force) {
   if (millis()-lastHealthPing < HEALTH_PING_DELAY_MS && !force)
     return;
@@ -264,6 +248,52 @@ void healthPing(bool force) {
   Serial.println(F("end."));
 }
 
+// Ethernet setup
+void WiFiEvent(WiFiEvent_t event)
+{
+  switch (event) {
+    case SYSTEM_EVENT_ETH_START:
+      Serial.println("ETH Started");
+      //set eth hostname here
+      ETH.setHostname(MqttTopic);
+      break;
+    case SYSTEM_EVENT_ETH_CONNECTED:
+      Serial.println("ETH Connected");
+      break;
+    case SYSTEM_EVENT_ETH_GOT_IP:
+      Serial.print("ETH MAC: ");
+      Serial.print(ETH.macAddress());
+      Serial.print(", IPv4: ");
+      Serial.print(ETH.localIP());
+      if (ETH.fullDuplex()) {
+        Serial.print(", FULL_DUPLEX");
+      }
+      Serial.print(", ");
+      Serial.print(ETH.linkSpeed());
+      Serial.println("Mbps");
+      eth_connected = true;
+      break;
+    case SYSTEM_EVENT_ETH_DISCONNECTED:
+      Serial.println("ETH Disconnected");
+      eth_connected = false;
+      break;
+    case SYSTEM_EVENT_ETH_STOP:
+      Serial.println("ETH Stopped");
+      eth_connected = false;
+      break;
+    default:
+      break;
+  }
+}
+
+// ------------------------------------ POSSIBLY SHARED FUNCTIONS ------------------------------------
+
+// For nice written boolean values instead of 0 and 1 in MQTT messages
+String bool2Str(bool buhl) {
+  return buhl ? "true" : "false";
+}
+
+// Does what the name tells you...
 String ip2Str(IPAddress ip){
   String s="";
   for (int i=0; i<4; i++) {
