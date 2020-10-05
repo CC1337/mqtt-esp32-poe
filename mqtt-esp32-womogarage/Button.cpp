@@ -1,4 +1,5 @@
 #include "Button.h"
+#include "config.h"
 
 void Button::begin(byte pin, String subtopic, MqttPubSub* mqtt) {
   _pin = pin;

@@ -1,20 +1,12 @@
 /*
  * This sketch was written for Olimex ESP32-POE.
  * Various sensors or actuators can be connected to be integrated into your smart home using MQTT (which integrates easily into f.e. ioBroker using the MQTT adapter.
+ * Environment specific configuration will likely be done in setup.cpp and config.h only.
  * 
  * MQTT and ETH setup based on https://github.com/zorce/ESP32-POE_MQTT_example/blob/master/ESP32-POE_MQTT.ino
  */
 
-#include <EEPROM.h>
-#include <WiFiClient.h>
-#include <PubSubClient.h>
-#include "config.h"
-#include "MqttPubSub.h"
-#include "MotionSensor.h"
-#include "Button.h"
-#include "DigitalStateOutput.h"
-#include "InfoLed.h"
-#include "LedSegment.h"
+#include "setup.cpp"
 
 #define ETH_CLK_MODE ETH_CLOCK_GPIO17_OUT
 #define ETH_PHY_POWER 12
@@ -23,9 +15,20 @@
 
 
 // Initializations of network clients
+IPAddress local_IP(NETWORK_LOCAL_IP);
+IPAddress gateway(NETWORK_GATEWAY);
+IPAddress subnet(NETWORK_SUBNET);
+
 WiFiClient espClient;
 PubSubClient mqttClient(espClient);
 MqttPubSub mqtt;
+
+const char* MqttTopic = MQTT_TOPIC;
+const char* MqttServerIp = MQTT_SERVER_IP;
+const short MqttServerPort = MQTT_SERVER_PORT;
+const char* MqttClientName = MQTT_SERVER_CLIENTNAME;
+const char* MqttUsername = MQTT_SERVER_USERNAME;
+const char* MqttPassword = MQTT_SERVER_PASSWORD;
 
 static bool eth_connected = false;
 uint64_t chipid;

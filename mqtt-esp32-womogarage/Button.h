@@ -11,10 +11,6 @@
 #define BUTTON_STATE_LONG "long"
 #define BUTTON_NUM_STATES 6
 
-#define BUTTON_LONG_PRESS_MS 1000
-#define BUTTON_RELEASE_MAX_DELAY 800
-#define BUTTON_PRESS_MIN_MS 80
-
 #define Button_h
 
 
