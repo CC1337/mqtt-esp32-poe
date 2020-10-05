@@ -1,28 +1,18 @@
 /*
  * This sketch was written for Olimex ESP32-POE.
  * Various sensors or actuators can be connected to be integrated into your smart home using MQTT (which integrates easily into f.e. ioBroker using the MQTT adapter.
+ * All environment config will be done in config.h and config.cpp
  * 
  * MQTT and ETH setup based on https://github.com/zorce/ESP32-POE_MQTT_example/blob/master/ESP32-POE_MQTT.ino
  */
 
-#include <EEPROM.h>
-#include <WiFiClient.h>
-#include <PubSubClient.h>
-#include "config.h"
-#include "MqttPubSub.h"
-#include "MotionSensor.h"
-#include "Button.h"
-#include "DigitalStateOutput.h"
-#include "InfoLed.h"
-#include "LedSegment.h"
+#include "config.cpp"
 
 #define ETH_CLK_MODE ETH_CLOCK_GPIO17_OUT
 #define ETH_PHY_POWER 12
 
 #include <ETH.h>
 
-
-// Initializations of network clients
 WiFiClient espClient;
 PubSubClient mqttClient(espClient);
 MqttPubSub mqtt;
