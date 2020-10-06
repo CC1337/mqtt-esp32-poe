@@ -1,7 +1,7 @@
 #include <EEPROM.h>
 #include "LedSegment.h"
 
-void LedSegment::begin(int ledOffset, int ledCount, String subtopic, int memoryAddress, MqttPubSub* mqtt) {
+void LedSegment::begin(int ledOffset, int ledCount, String subtopic, int memoryAddress, AddressableLeds* leds, MqttPubSub* mqtt) {
   Serial.print("Init LedSegment - ledOffset: " + ledOffset);
   Serial.print(" | ledCount: " + ledCount);
   Serial.print(" | subtopic: " + subtopic);
@@ -14,6 +14,7 @@ void LedSegment::begin(int ledOffset, int ledCount, String subtopic, int memoryA
   _subtopicAnimation = subtopic + "/animation";
   _subtopicSpeed = subtopic + "/speed";
   _mqtt = mqtt;
+  _leds = leds;
   _memoryAddress = memoryAddress;
   _memoryAddressLevel = memoryAddress;
   _memoryAddressAnimation = memoryAddress + 1;
@@ -55,6 +56,8 @@ void LedSegment::callback(String receivedMessageTopic, String newValueString) {
     newValue = (byte)newValueInt;
 
   if (receivedMessageTopic.endsWith(_subtopicLevel)) {
+    if (newValueInt > 100)
+    newValue = 100;
 
     if (_level == newValue)
       return;
@@ -97,7 +100,9 @@ void LedSegment::callback(String receivedMessageTopic, String newValueString) {
 
 void LedSegment::setLevel(byte newValue) {
   _level = newValue;
-  // TODO set LEDs.
+  for (int i = _ledOffset; i < _ledOffset + _ledCount; i++) {
+    _leds->setLedWhite(i, _leds->linearPwm(newValue));
+  }
 }
 
 void LedSegment::setAnimation(byte newValue) {

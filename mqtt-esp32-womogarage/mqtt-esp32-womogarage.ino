@@ -118,7 +118,7 @@ void initAddressableLeds() {
 void initLedSegments() {
   initAddressableLeds();
   for (byte i=0; i<LedSegmentCount; i++)
-    ledSegments[i].begin(LedSegmentLedOffsets[i], LedSegmentLedCounts[i], LedSegmentTopics[i], LedSegmentMemoryAddresses[i], &mqtt);
+    ledSegments[i].begin(LedSegmentLedOffsets[i], LedSegmentLedCounts[i], LedSegmentTopics[i], LedSegmentMemoryAddresses[i], &leds, &mqtt);
 }
 
 void callbackLedSegments(String messageTopic, String newState) {

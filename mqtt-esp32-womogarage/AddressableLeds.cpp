@@ -47,6 +47,6 @@ void AddressableLeds::setLedWhiteMax(int index, byte val) {
   setLedCRGB(index, getLedCRGB(index) &= crgb_val);
 }
 
-byte AddressableLeds::linearPWM(byte percentage) {
+byte AddressableLeds::linearPwm(byte percentage) {
   return _linear_pwm[percentage];
 }
