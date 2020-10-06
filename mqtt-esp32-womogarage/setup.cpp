@@ -3,7 +3,6 @@
 #include <EEPROM.h>
 #include <WiFiClient.h>
 #include <PubSubClient.h>
-//#include <FastLED.h>
 #include "config.h"
 #include "MqttPubSub.h"
 #include "MotionSensor.h"

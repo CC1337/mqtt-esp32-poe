@@ -112,6 +112,7 @@ LedSegment ledSegments[LedSegmentCount];
 
 void initAddressableLeds() {
   leds.begin(ADDRESSABLE_LED_PIN, ADDRESSABLE_LED_COUNT);
+  FastLED.addLeds<ADDRESSABLE_LED_TYPE, ADDRESSABLE_LED_PIN>(leds.ledArray, ADDRESSABLE_LED_COUNT);
 }
 
 void initLedSegments() {
