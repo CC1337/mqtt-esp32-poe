@@ -10,6 +10,7 @@
 #include "DigitalStateOutput.h"
 #include "InfoLed.h"
 #include "AddressableLeds.h"
+#include "AddressableLedPower.h"
 #include "LedSegment.h"
 
 
