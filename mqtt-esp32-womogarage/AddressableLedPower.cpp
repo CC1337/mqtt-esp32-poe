@@ -8,7 +8,15 @@ void AddressableLedPower::begin(byte pin, AddressableLeds* leds) {
 }
 
 void AddressableLedPower::loop() {
-  // TODO control power pin
+  bool isAnyLedOn = _leds->isAnyLedOn();
+  if (!isOn() && isAnyLedOn)
+    on();
+  else if (isOn() && !isAnyLedOn && _ledsLastOnMillis > 0 && millis() - _ledsLastOnMillis > ADDRESSABLE_LEDS_POWER_OFF_DELAY_MS)
+    off();
+  else if (!isAnyLedOn && _ledsLastOnMillis == 0)
+    _ledsLastOnMillis = millis();
+  else if (isAnyLedOn && _ledsLastOnMillis != 0)
+    _ledsLastOnMillis = 0;
 }
 
 void AddressableLedPower::on() {

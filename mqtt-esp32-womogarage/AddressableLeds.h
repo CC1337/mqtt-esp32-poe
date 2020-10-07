@@ -18,13 +18,14 @@ class AddressableLeds {
     void show();
     byte getPin();
     int getCount();
+    byte linearPwm(byte percentage);
     CRGB getLedCRGB(int index);
     int getLedWhite(int index);
     void setLedCRGB(int index, CRGB val);
     void setLedWhite(int index, byte val);
     void setLedWhiteMin(int index, byte val);
     void setLedWhiteMax(int index, byte val);
-    byte linearPwm(byte percentage);
+    bool isAnyLedOn();
 
 };
 

@@ -10,6 +10,7 @@ class AddressableLedPower {
   private: 
     byte _pin;
     AddressableLeds* _leds;
+    long _ledsLastOnMillis = 0;
 
   public:
     void begin(byte pin, AddressableLeds* leds);

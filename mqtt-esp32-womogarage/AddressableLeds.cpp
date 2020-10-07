@@ -19,6 +19,10 @@ int AddressableLeds::getCount() {
   return _ledCount;
 }
 
+byte AddressableLeds::linearPwm(byte percentage) {
+  return _linear_pwm[percentage];
+}
+
 CRGB AddressableLeds::getLedCRGB(int index) {
   return ledArray[index];
 }
@@ -47,6 +51,12 @@ void AddressableLeds::setLedWhiteMax(int index, byte val) {
   setLedCRGB(index, getLedCRGB(index) &= crgb_val);
 }
 
-byte AddressableLeds::linearPwm(byte percentage) {
-  return _linear_pwm[percentage];
+bool AddressableLeds::isAnyLedOn() {
+  for (int i=0; i<_ledCount; i++) {
+    CRGB crgb_val = getLedCRGB(i);
+    if (crgb_val.r + crgb_val.g + crgb_val.b != 0) {
+      return true;
+    }
+  }
+  return false;
 }
