@@ -20,3 +20,7 @@ void AddressableLedPower::off() {
   Serial.println(F("LED Power OFF"));
   digitalWrite(_pin, ADDRESSABLE_LED_POWER_PIN_INVERT ? HIGH : LOW);
 }
+
+bool AddressableLedPower::isOn() {
+  return ADDRESSABLE_LED_POWER_PIN_INVERT ? !digitalRead(_pin) : digitalRead(_pin);
+}

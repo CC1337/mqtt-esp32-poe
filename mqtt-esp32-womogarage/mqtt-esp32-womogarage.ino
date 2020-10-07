@@ -134,7 +134,8 @@ void loopLedSegments() {
     ledSegments[i].loop();
   }
   ledPower.loop();
-  leds.show();
+  if (ledPower.isOn())
+    leds.show();
 }
 
 

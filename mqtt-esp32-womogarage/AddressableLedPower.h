@@ -16,6 +16,7 @@ class AddressableLedPower {
     void loop();
     void on();
     void off();
+    bool isOn();
 };
 
 #endif
