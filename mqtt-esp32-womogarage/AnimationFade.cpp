@@ -26,7 +26,7 @@ void AnimationFade::doAnimationStep(byte animationStep) {
     _leds->ledFadeStepToPercentage(i, _targetLevel, animationStep);
   }
 
-  _isRunning = animationStep == 100;
+  _isRunning = animationStep != 100;
 }
 
 bool AnimationFade::isRunning() {
