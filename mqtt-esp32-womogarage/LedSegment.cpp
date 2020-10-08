@@ -44,7 +44,7 @@ void LedSegment::restoreFromEepromAndPublish() {
   setAnimation(eepromAnimation);
   setAnimationSpeed(eepromSpeed);
   _mqtt->publishState(_subtopicLevel, String(eepromLevel));
-  _mqtt->publishState(_subtopicAnimation, String(eepromAnimation));
+  _mqtt->publishState(_subtopicAnimation, number2AnimationName(eepromAnimation));
   _mqtt->publishState(_subtopicAnimationIndex, getPossibleAnimationsJsonArray());
   _mqtt->publishState(_subtopicSpeed, String(eepromSpeed));
 }
