@@ -260,13 +260,10 @@ void healthPing(bool force) {
   if (millis()-lastHealthPing < HEALTH_PING_DELAY_MS && !force)
     return;
   lastHealthPing = millis();
-  Serial.println(F("Starting health ping... "));
 
   String payload = "isAlive_";
   payload.concat(String(random(65535)));
   mqtt.publishMessage("health", "health_ping", payload, "");
-
-  Serial.println(F("end."));
 }
 
 // Ethernet setup
