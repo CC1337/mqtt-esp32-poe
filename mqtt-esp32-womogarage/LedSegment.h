@@ -29,6 +29,7 @@ class LedSegment {
     byte _speed;
     byte _activeAnimation = 0;
     int _animationStep = -1;
+    long _lastAnimationStepMillis = 0;
     MqttPubSub* _mqtt;
     AddressableLeds* _leds;
     AnimationNone _animationNone;

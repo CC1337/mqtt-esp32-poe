@@ -79,12 +79,11 @@ byte LedSegment::animationName2Number(String animationName) {
 
 
 void LedSegment::loop() {
-  if (_animationStep < 0)
-    return;
-  else if (_animationStep > 100) {
+  if (_animationStep > 100)
     _animationStep = -1;
+  
+  if (_animationStep < 0 || millis() - _lastAnimationStepMillis < ceil(sqrt(100 - _speed) * 2.0))
     return;
-  }
 
   bool animationIsRunning = false;
   
@@ -106,6 +105,7 @@ void LedSegment::loop() {
   }
 
   _animationStep++;
+  _lastAnimationStepMillis = millis();
 }
 
 byte LedSegment::strToPercentage(String newValueString) {
