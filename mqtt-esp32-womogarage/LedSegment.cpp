@@ -108,20 +108,25 @@ void LedSegment::loop() {
   _animationStep++;
 }
 
+byte LedSegment::strToPercentage(String newValueString) {
+  int newValueInt = newValueString.toInt();
+  if (newValueInt > 100)
+    return 100;
+  else if (newValueInt < 0)
+    return 0;
+  else 
+    return (byte)newValueInt;
+}
+
 void LedSegment::callback(String receivedMessageTopic, String newValueString) {
   if(_ledCount == 0)
     return;
 
-  int newValueInt = newValueString.toInt();
-  byte newValue;
-  if (newValueInt > 100)
-    newValue = 100;
-  else if (newValueInt < 0)
-    newValue = 0;
-  else 
-    newValue = (byte)newValueInt;
+  byte newValue = 0;
 
   if (receivedMessageTopic.endsWith(_subtopicLevel)) {
+
+    newValue = strToPercentage(newValueString);
 
     if (_level == newValue)
       return;
@@ -134,6 +139,8 @@ void LedSegment::callback(String receivedMessageTopic, String newValueString) {
     setLevel(newValue);
   } else if (receivedMessageTopic.endsWith(_subtopicAnimation)) {
 
+    newValue = animationName2Number(newValueString);
+
     if (_animation == newValue)
       return;
 
@@ -144,6 +151,8 @@ void LedSegment::callback(String receivedMessageTopic, String newValueString) {
     _mqtt->publishState(_subtopicAnimation, number2AnimationName(newValue));
     setAnimation(newValue);
   } else if (receivedMessageTopic.endsWith(_subtopicSpeed)) {
+
+    newValue = strToPercentage(newValueString);
 
     if (_speed == newValue)
       return;
@@ -164,9 +173,7 @@ void LedSegment::callback(String receivedMessageTopic, String newValueString) {
 
 void LedSegment::setLevel(byte newValue) {
   _level = newValue;
-  /*for (int i = _ledOffset; i < _ledOffset + _ledCount; i++) {
-    _leds->setLedWhite(i, _leds->linearPwm(newValue));
-  }*/
+
   switch(_animation) {
     case ANIMATION_FADE:
       _animationFade.start(_level);
@@ -176,6 +183,7 @@ void LedSegment::setLevel(byte newValue) {
       _animationNone.start(_level);
       break;
   }
+  
   // This switches/triggers the new animation start
   _activeAnimation = _animation;
   _animationStep = 0;

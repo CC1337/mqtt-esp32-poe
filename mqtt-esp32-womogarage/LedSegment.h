@@ -43,6 +43,7 @@ class LedSegment {
     void setLevel(byte newValue);
     void setAnimation(byte newValue);
     void setAnimationSpeed(byte newValue);
+    byte strToPercentage(String newValueString);
 
   public:
     void begin(int firstLed, int ledOffset, String subtopic, int memoryAddress, AddressableLeds* leds, MqttPubSub* mqtt);
