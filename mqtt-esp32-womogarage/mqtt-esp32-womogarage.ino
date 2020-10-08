@@ -112,9 +112,9 @@ AddressableLedPower ledPower;
 LedSegment ledSegments[LedSegmentCount];
 
 void initAddressableLeds() {
-  leds.begin(ADDRESSABLE_LED_PIN, ADDRESSABLE_LED_COUNT);
+  ledPower.begin(ADDRESSABLE_LED_POWER_PIN);
+  leds.begin(ADDRESSABLE_LED_PIN, ADDRESSABLE_LED_COUNT, &ledPower);
   FastLED.addLeds<ADDRESSABLE_LED_TYPE, ADDRESSABLE_LED_PIN>(leds.ledArray, ADDRESSABLE_LED_COUNT);
-  ledPower.begin(ADDRESSABLE_LED_POWER_PIN, &leds);
 }
 
 void initLedSegments() {
@@ -133,9 +133,7 @@ void loopLedSegments() {
   for (byte i=0; i<LedSegmentCount; i++) {
     ledSegments[i].loop();
   }
-  ledPower.loop();
-  if (ledPower.isOn())
-    leds.show();
+  leds.show();
 }
 
 

@@ -1,14 +1,12 @@
 #include <EEPROM.h>
 #include "AddressableLedPower.h"
 
-void AddressableLedPower::begin(byte pin, AddressableLeds* leds) {
+void AddressableLedPower::begin(byte pin) {
   _pin = pin;
-  _leds = leds;
   pinMode(_pin, OUTPUT);
 }
 
-void AddressableLedPower::loop() {
-  bool isAnyLedOn = _leds->isAnyLedOn();
+void AddressableLedPower::updatePowerstate(bool isAnyLedOn) {
   if (!isOn() && isAnyLedOn)
     on();
   else if (isOn() && !isAnyLedOn && _ledsLastOnMillis > 0 && millis() - _ledsLastOnMillis > ADDRESSABLE_LEDS_POWER_OFF_DELAY_MS)

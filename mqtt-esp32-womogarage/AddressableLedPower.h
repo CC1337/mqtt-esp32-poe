@@ -1,6 +1,5 @@
 #include <Arduino.h>
-#include "MqttPubSub.h"
-#include "AddressableLeds.h"
+#include "config.h"
 
 #ifndef AddressableLedPower_h
 #define AddressableLedPower_h
@@ -9,12 +8,11 @@
 class AddressableLedPower {
   private: 
     byte _pin;
-    AddressableLeds* _leds;
     long _ledsLastOnMillis = 0;
 
   public:
-    void begin(byte pin, AddressableLeds* leds);
-    void loop();
+    void begin(byte pin);
+    void updatePowerstate(bool isAnyLedOn);
     void on();
     void off();
     bool isOn();

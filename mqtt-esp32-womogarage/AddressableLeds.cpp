@@ -1,13 +1,18 @@
 #include "AddressableLeds.h"
 
-void AddressableLeds::begin(int pin, int ledCount) {
+void AddressableLeds::begin(int pin, int ledCount, AddressableLedPower* ledPower) {
   _pin = pin;
   _ledCount = ledCount;
+  _ledPower = ledPower;
   ledArray = new CRGB[_ledCount];
 }
 
 void AddressableLeds::show() {
-  FastLED.show();
+  _ledPower->updatePowerstate(isAnyLedOn());
+  if (_ledPower->isOn()) {
+    FastLED.show();
+  }
+
   // if power on, animation step, power management
 }
 
