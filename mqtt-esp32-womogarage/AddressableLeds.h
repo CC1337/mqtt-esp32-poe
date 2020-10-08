@@ -27,6 +27,7 @@ class AddressableLeds {
     void setLedWhite(int index, byte val);
     void setLedWhiteMin(int index, byte val);
     void setLedWhiteMax(int index, byte val);
+    void ledFadeStepToPercentage(int index, byte targetLevel, byte fadePercentage);
     bool isAnyLedOn();
 
 };

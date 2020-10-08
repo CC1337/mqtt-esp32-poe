@@ -56,6 +56,35 @@ void AddressableLeds::setLedWhiteMax(int index, byte val) {
   setLedCRGB(index, getLedCRGB(index) &= crgb_val);
 }
 
+void AddressableLeds::ledFadeStepToPercentage(int index, byte targetLevel, byte fadePercentage) {
+  byte newBrightness;
+  byte currentBrightness = getLedWhite(index);
+  byte targetBrightness = linearPwm(targetLevel);
+
+  if (currentBrightness < targetBrightness) {
+    // FADE UP
+    newBrightness = linearPwm(fadePercentage);
+    if (newBrightness > targetBrightness) {
+      // END
+      setLedWhite(index, targetBrightness);
+    }
+    else {
+      setLedWhiteMin(index, newBrightness);
+    }
+  }
+  else {
+    // FADE DOWN
+    newBrightness = linearPwm(100 - fadePercentage);
+    if (newBrightness < targetBrightness) {
+      // END
+      setLedWhite(index, targetBrightness);
+    }
+    else {
+      setLedWhiteMax(index, newBrightness);
+    }
+  }
+}
+
 bool AddressableLeds::isAnyLedOn() {
   for (int i=0; i<_ledCount; i++) {
     CRGB crgb_val = getLedCRGB(i);

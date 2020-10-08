@@ -2,11 +2,14 @@
 #include "MqttPubSub.h"
 #include "AddressableLeds.h"
 #include "AnimationNone.h"
+#include "AnimationFade.h"
 
 #ifndef LedSegment_h
 #define LedSegment_h
 
-#define ANIMATIONS_COUNT 1
+#define ANIMATIONS_COUNT 2
+#define ANIMATION_NONE 0
+#define ANIMATION_FADE 1
 
 class LedSegment {
   private: 
@@ -24,9 +27,12 @@ class LedSegment {
     byte _level;
     byte _animation;
     byte _speed;
+    byte _activeAnimation = 0;
+    int _animationStep = -1;
     MqttPubSub* _mqtt;
     AddressableLeds* _leds;
     AnimationNone _animationNone;
+    AnimationFade _animationFade;
     String _animationNames[ANIMATIONS_COUNT];
     const byte _numAnimations = ANIMATIONS_COUNT;
     void prepareAnimations();

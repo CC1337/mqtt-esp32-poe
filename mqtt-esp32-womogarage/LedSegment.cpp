@@ -29,7 +29,11 @@ void LedSegment::begin(int ledOffset, int ledCount, String subtopic, int memoryA
 }
 
 void LedSegment::prepareAnimations() {
-  _animationNames[0] = _animationNone.getName();
+  _animationNone.begin(_ledOffset, _ledCount, _leds);
+  _animationFade.begin(_ledOffset, _ledCount, _leds);
+  
+  _animationNames[ANIMATION_NONE] = _animationNone.getName();
+  _animationNames[ANIMATION_FADE] = _animationFade.getName();
 }
 
 void LedSegment::restoreFromEepromAndPublish() {
@@ -75,7 +79,33 @@ byte LedSegment::animationName2Number(String animationName) {
 
 
 void LedSegment::loop() {
-  // TODO do animations
+  if (_animationStep < 0)
+    return;
+  else if (_animationStep > 100) {
+    _animationStep = -1;
+    return;
+  }
+
+  bool animationIsRunning = false;
+  
+  switch(_activeAnimation) {
+    case ANIMATION_FADE:
+      _animationFade.doAnimationStep(_animationStep);
+      animationIsRunning = _animationFade.isRunning();
+      break;
+    case ANIMATION_NONE:
+    default:
+      _animationNone.doAnimationStep();
+      animationIsRunning = _animationNone.isRunning();
+      break;
+  }
+
+  if (!animationIsRunning) {
+    _animationStep = -1;
+    return;
+  }
+
+  _animationStep++;
 }
 
 void LedSegment::callback(String receivedMessageTopic, String newValueString) {
@@ -84,16 +114,14 @@ void LedSegment::callback(String receivedMessageTopic, String newValueString) {
 
   int newValueInt = newValueString.toInt();
   byte newValue;
-  if (newValueInt > 255)
-    newValue = 255;
+  if (newValueInt > 100)
+    newValue = 100;
   else if (newValueInt < 0)
     newValue = 0;
   else 
     newValue = (byte)newValueInt;
 
   if (receivedMessageTopic.endsWith(_subtopicLevel)) {
-    if (newValueInt > 100)
-    newValue = 100;
 
     if (_level == newValue)
       return;
@@ -113,7 +141,7 @@ void LedSegment::callback(String receivedMessageTopic, String newValueString) {
       EEPROM.write(_memoryAddressAnimation, newValue);
       EEPROM.commit();
     }
-    _mqtt->publishState(_subtopicAnimation, String(newValue));
+    _mqtt->publishState(_subtopicAnimation, number2AnimationName(newValue));
     setAnimation(newValue);
   } else if (receivedMessageTopic.endsWith(_subtopicSpeed)) {
 
@@ -136,17 +164,27 @@ void LedSegment::callback(String receivedMessageTopic, String newValueString) {
 
 void LedSegment::setLevel(byte newValue) {
   _level = newValue;
-  for (int i = _ledOffset; i < _ledOffset + _ledCount; i++) {
+  /*for (int i = _ledOffset; i < _ledOffset + _ledCount; i++) {
     _leds->setLedWhite(i, _leds->linearPwm(newValue));
+  }*/
+  switch(_animation) {
+    case ANIMATION_FADE:
+      _animationFade.start(_level);
+      break;
+    case ANIMATION_NONE:
+    default:
+      _animationNone.start(_level);
+      break;
   }
+  // This switches/triggers the new animation start
+  _activeAnimation = _animation;
+  _animationStep = 0;
 }
 
 void LedSegment::setAnimation(byte newValue) {
   _animation = newValue;
-  // TODO set LEDs.
 }
 
 void LedSegment::setAnimationSpeed(byte newValue) {
   _speed = newValue;
-  // TODO set LEDs.
 }
