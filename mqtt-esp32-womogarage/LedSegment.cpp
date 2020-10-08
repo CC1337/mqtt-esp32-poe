@@ -12,6 +12,7 @@ void LedSegment::begin(int ledOffset, int ledCount, String subtopic, int memoryA
   _subtopic = subtopic;
   _subtopicLevel = subtopic + "/level";
   _subtopicAnimation = subtopic + "/animation";
+  _subtopicAnimationIndex = subtopic + "/animations_possible";
   _subtopicSpeed = subtopic + "/speed";
   _mqtt = mqtt;
   _leds = leds;
@@ -23,7 +24,12 @@ void LedSegment::begin(int ledOffset, int ledCount, String subtopic, int memoryA
   _mqtt->subscribe(_subtopicLevel);
   _mqtt->subscribe(_subtopicAnimation);
   _mqtt->subscribe(_subtopicSpeed);
+  prepareAnimations();
   restoreFromEepromAndPublish();
+}
+
+void LedSegment::prepareAnimations() {
+  _animationNames[0] = _animationNone.getName();
 }
 
 void LedSegment::restoreFromEepromAndPublish() {
@@ -35,8 +41,38 @@ void LedSegment::restoreFromEepromAndPublish() {
   setAnimationSpeed(eepromSpeed);
   _mqtt->publishState(_subtopicLevel, String(eepromLevel));
   _mqtt->publishState(_subtopicAnimation, String(eepromAnimation));
+  _mqtt->publishState(_subtopicAnimationIndex, getPossibleAnimationsJsonArray());
   _mqtt->publishState(_subtopicSpeed, String(eepromSpeed));
 }
+
+String LedSegment::getPossibleAnimationsJsonArray() {
+  String animationsPossible = String("[ ");
+  for (int i=0; i<_numAnimations; i++) {
+    animationsPossible.concat("\"");
+    animationsPossible.concat(_animationNames[i]);
+    animationsPossible.concat("\"");
+    if (i < _numAnimations - 1)
+      animationsPossible.concat(", ");
+  }
+  animationsPossible.concat(" ]");
+  return animationsPossible;
+}
+
+String LedSegment::number2AnimationName(byte number) {
+  if (number < 0 || number >= _numAnimations)
+    number = 0;
+
+  return _animationNames[number];
+}
+
+byte LedSegment::animationName2Number(String animationName) {
+  for (int i=0; i<_numAnimations; i++) {
+    if (String(_animationNames[i]).equalsIgnoreCase(animationName))
+      return i;
+  }
+  return 0;
+}
+
 
 void LedSegment::loop() {
   // TODO do animations
