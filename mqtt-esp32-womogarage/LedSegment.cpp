@@ -84,7 +84,7 @@ void LedSegment::loop() {
   if (_animationStep > 100)
     _animationStep = -1;
   
-  if (_animationStep < 0 || millis() - _lastAnimationStepMillis < ceil(sqrt(100 - _speed) * 2.0))
+  if (_animationStep < 0 || millis() - _lastAnimationStepMillis < ceil(sqrt(100 - _speed) * 5.0))
     return;
 
   bool animationIsRunning = false;
