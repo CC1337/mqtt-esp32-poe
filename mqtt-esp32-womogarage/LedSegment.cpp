@@ -31,9 +31,11 @@ void LedSegment::begin(int ledOffset, int ledCount, String subtopic, int memoryA
 void LedSegment::prepareAnimations() {
   _animationNone.begin(_ledOffset, _ledCount, _leds);
   _animationFade.begin(_ledOffset, _ledCount, _leds);
+  _animationFlicker.begin(_ledOffset, _ledCount, _leds);
   
   _animationNames[ANIMATION_NONE] = _animationNone.getName();
   _animationNames[ANIMATION_FADE] = _animationFade.getName();
+  _animationNames[ANIMATION_FLICKER] = _animationFlicker.getName();
 }
 
 void LedSegment::restoreFromEepromAndPublish() {
@@ -91,6 +93,10 @@ void LedSegment::loop() {
     case ANIMATION_FADE:
       _animationFade.doAnimationStep(_animationStep);
       animationIsRunning = _animationFade.isRunning();
+      break;
+    case ANIMATION_FLICKER:
+      _animationFlicker.doAnimationStep(_animationStep);
+      animationIsRunning = _animationFlicker.isRunning();
       break;
     case ANIMATION_NONE:
     default:
@@ -172,17 +178,20 @@ void LedSegment::callback(String receivedMessageTopic, String newValueString) {
 }
 
 void LedSegment::setLevel(byte newValue) {
-  _level = newValue;
-
   switch(_animation) {
     case ANIMATION_FADE:
-      _animationFade.start(_level);
+      _animationFade.start(newValue);
+      break;
+    case ANIMATION_FLICKER:
+      _animationFlicker.start(newValue, _level);
       break;
     case ANIMATION_NONE:
     default:
-      _animationNone.start(_level);
+      _animationNone.start(newValue);
       break;
   }
+
+  _level = newValue;
   
   // This switches/triggers the new animation start
   _activeAnimation = _animation;

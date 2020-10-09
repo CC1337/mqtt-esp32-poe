@@ -3,13 +3,15 @@
 #include "AddressableLeds.h"
 #include "AnimationNone.h"
 #include "AnimationFade.h"
+#include "AnimationFlicker.h"
 
 #ifndef LedSegment_h
 #define LedSegment_h
 
-#define ANIMATIONS_COUNT 2
+#define ANIMATIONS_COUNT 3
 #define ANIMATION_NONE 0
 #define ANIMATION_FADE 1
+#define ANIMATION_FLICKER 2
 
 class LedSegment {
   private: 
@@ -24,9 +26,9 @@ class LedSegment {
     int _memoryAddressLevel;
     int _memoryAddressAnimation;
     int _memoryAddressSpeed;
-    byte _level;
-    byte _animation;
-    byte _speed;
+    byte _level = 0;
+    byte _animation = 0;
+    byte _speed = 100;
     byte _activeAnimation = 0;
     int _animationStep = -1;
     long _lastAnimationStepMillis = 0;
@@ -34,6 +36,7 @@ class LedSegment {
     AddressableLeds* _leds;
     AnimationNone _animationNone;
     AnimationFade _animationFade;
+    AnimationFlicker _animationFlicker;
     String _animationNames[ANIMATIONS_COUNT];
     const byte _numAnimations = ANIMATIONS_COUNT;
     void prepareAnimations();
