@@ -17,7 +17,9 @@ class AnimationFlicker {
     byte _step2Level;
     bool _isRunning = false;
     int *_randomIndex;
-    void swapRandomIndex(int a, int b);
+    int *_randomIndex2;
+    int *_randomIndex3;
+    void swapRandomIndex(int* arr, int a, int b);
 
 
   public:
