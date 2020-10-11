@@ -34,7 +34,7 @@ const byte DigitalStateOutputPins[DigitalStateOutputCount] =
 const byte DigitalStateOutputInverted[DigitalStateOutputCount] =
 {
   false,
-  true
+  false
 };
 // 1 byte needed for each
 const byte DigitalStateOutputMemoryAddresses[DigitalStateOutputCount] =
