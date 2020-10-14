@@ -75,7 +75,7 @@ void InfoLed::setState(byte newState) {
       break;
     case 3: // INFOLED_STATE_BLINK_SLOW
       _blinkDelay = 2000;
-      _blinkLength = 100;
+      _blinkLength = 50;
       break;
     case 4: // INFOLED_STATE_BLINK_FAST
       _blinkDelay = 250;
