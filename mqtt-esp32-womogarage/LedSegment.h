@@ -31,7 +31,7 @@ class LedSegment {
     byte _speed = 100;
     byte _activeAnimation = 0;
     int _animationStep = -1;
-    long _lastAnimationStepMillis = 0;
+    unsigned long _lastAnimationStepMicros = 0;
     MqttPubSub* _mqtt;
     AddressableLeds* _leds;
     AnimationNone _animationNone;
@@ -48,6 +48,7 @@ class LedSegment {
     void setAnimation(byte newValue);
     void setAnimationSpeed(byte newValue);
     byte strToPercentage(String newValueString);
+    bool waitingForNextFrame();
 
   public:
     void begin(int firstLed, int ledOffset, String subtopic, int memoryAddress, AddressableLeds* leds, MqttPubSub* mqtt);

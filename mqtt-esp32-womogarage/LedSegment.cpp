@@ -86,7 +86,7 @@ void LedSegment::loop() {
   if (_animationStep == 0 && !_leds->powerIsOn())
     _leds->powerOn();
 
-  if (_animationStep < 0 || !_leds->powerOnDelayIsOver() || millis() - _lastAnimationStepMillis < ceil(sqrt(100 - _speed) * 5.0))
+  if (_animationStep < 0 || !_leds->powerOnDelayIsOver() || waitingForNextFrame())
     return;
 
   bool animationIsRunning = false;
@@ -113,7 +113,7 @@ void LedSegment::loop() {
   }
 
   _animationStep++;
-  _lastAnimationStepMillis = millis();
+  _lastAnimationStepMicros = micros();
 }
 
 byte LedSegment::strToPercentage(String newValueString) {
@@ -124,6 +124,10 @@ byte LedSegment::strToPercentage(String newValueString) {
     return 0;
   else 
     return (byte)newValueInt;
+}
+
+bool LedSegment::waitingForNextFrame() {
+  return micros() - _lastAnimationStepMicros < ceil((100.1 - (float)_speed) * (100.1 - (float)_speed) * 10.0);
 }
 
 void LedSegment::callback(String receivedMessageTopic, String newValueString) {
