@@ -100,7 +100,6 @@
 #define ADDRESSABLE_LEDS_POWER_ON_DELAY_MS 800
 
 
-
 /*
  * ---------- TIMINGS ----------
  */
