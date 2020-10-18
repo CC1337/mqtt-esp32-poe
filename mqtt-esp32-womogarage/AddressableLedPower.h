@@ -9,6 +9,7 @@ class AddressableLedPower {
   private: 
     byte _pin;
     long _ledsLastOnMillis = 0;
+    long _lastPowerTurnedOnMillis = 0;
 
   public:
     void begin(byte pin);
@@ -16,6 +17,7 @@ class AddressableLedPower {
     void on();
     void off();
     bool isOn();
+    bool powerOnDelayIsOver();
 };
 
 #endif

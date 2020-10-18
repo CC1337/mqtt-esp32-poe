@@ -12,8 +12,6 @@ void AddressableLeds::show() {
   if (_ledPower->isOn()) {
     FastLED.show();
   }
-
-  // if power on, animation step, power management
 }
 
 byte AddressableLeds::getPin() {
@@ -93,4 +91,17 @@ bool AddressableLeds::isAnyLedOn() {
     }
   }
   return false;
+}
+
+
+bool AddressableLeds::powerIsOn() {
+  return _ledPower->isOn();
+}
+
+void AddressableLeds::powerOn() {
+  _ledPower->updatePowerstate(true);
+}
+
+bool AddressableLeds::powerOnDelayIsOver() {
+  return _ledPower->powerOnDelayIsOver();
 }
