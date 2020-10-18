@@ -9,15 +9,22 @@
  */
 
 #define DEBUG true
+#define OUTDOOR_VLAN false
 
 
 /*
  * ---------- NETWORK ----------
  */
 
-#define NETWORK_LOCAL_IP 192, 168, 0, 95
-#define NETWORK_GATEWAY 192, 168, 0, 1
-#define NETWORK_SUBNET 255, 255, 255, 0
+#if OUTDOOR_VLAN
+  #define NETWORK_LOCAL_IP 192, 168, 2, 4
+  #define NETWORK_GATEWAY 192, 168, 2, 13
+  #define NETWORK_SUBNET 255, 255, 255, 0
+#else
+  #define NETWORK_LOCAL_IP 192, 168, 0, 95
+  #define NETWORK_GATEWAY 192, 168, 0, 1
+  #define NETWORK_SUBNET 255, 255, 255, 0
+#endif
 
 
 /*
@@ -25,7 +32,11 @@
  */
 
 #define MQTT_TOPIC "ESP32-Wohnmobilgarage"
-#define MQTT_SERVER_IP "192.168.0.90"       // IP address of the MQTT broker
+#if OUTDOOR_VLAN
+  #define MQTT_SERVER_IP "192.168.2.13"       // IP address of the MQTT broker
+#else
+  #define MQTT_SERVER_IP "192.168.0.90"       // IP address of the MQTT broker
+#endif
 #define MQTT_SERVER_PORT 1883               // IP port of the MQTT broker
 #define MQTT_SERVER_CLIENTNAME MQTT_TOPIC;
 #define MQTT_SERVER_USERNAME NULL
