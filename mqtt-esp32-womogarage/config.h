@@ -46,6 +46,9 @@
 #define LED_VG_VERT_1_SUBTOPIC "LedVorgartenVertikal1"
 #define LED_VG_VERT_2_SUBTOPIC "LedVorgartenVertikal2"
 #define LED_VG_VERT_3_SUBTOPIC "LedVorgartenVertikal3"
+#define LED_VG_VERT_4_SUBTOPIC "LedVorgartenVertikal4"
+#define LED_VG_SEITE_SUBTOPIC "LedVorgartenSeite"
+#define LED_GARTEN_SUBTOPIC "LedGarten"
 #define LED_TASTER_LICHT_VORGARTEN_SUBTOPIC "LedTasterLichtVorgarten"
 #define LED_TASTER_STECKDOSE_WOHNMOBIL_SUBTOPIC "LedTasterWohnmobilSteckdose"
 #define TASTER_LICHT_VORGARTEN_SUBTOPIC "TasterLichtVorgarten"
@@ -72,7 +75,7 @@
  * ---------- FLASH MEMORY ----------
  */
 
-#define EEPROM_SIZE 20
+#define EEPROM_SIZE 21
 
 #define VORGARTEN_STRAHLER_MEMORY_ADDRESS 1               // 1 byte needed
 #define WOHNMOBIL_STECKDOSE_MEMORY_ADDRESS 2              // 1 byte needed
@@ -81,16 +84,19 @@
 #define LED_VG_VERT_3_MEMORY_ADDRESS 9                    // 3 byte needed
 #define LED_TASTER_LICHT_VORGARTEN_MEMORY_ADDRESS 10      // 1 byte needed
 #define LED_TASTER_STECKDOSE_WOHNMOBIL_MEMORY_ADDRESS 11  // 1 byte needed
+#define LED_VG_VERT_4_MEMORY_ADDRESS 12                   // 3 byte needed
+#define LED_VG_SEITE_MEMORY_ADDRESS 15                    // 3 byte needed
+#define LED_GARTEN_MEMORY_ADDRESS 18                      // 3 byte needed
 
 
 /*
  * ---------- ADDRESSABLE LEDS ----------
  */
 
-#define ADDRESSABLE_LED_COUNT 60
+#define ADDRESSABLE_LED_COUNT 131
 #define ADDRESSABLE_LED_TYPE UCS1903B
 #define ADDRESSABLE_LED_POWER_PIN_INVERT false
-#define ADDRESSABLE_LEDS_POWER_OFF_DELAY_MS 5000
+#define ADDRESSABLE_LEDS_POWER_OFF_DELAY_MS 30000
 
 
 

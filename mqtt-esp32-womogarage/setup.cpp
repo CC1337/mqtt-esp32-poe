@@ -105,29 +105,41 @@ const byte ButtonPins[ButtonCount] =
  * ---------- ADDRESSABLE LED SEGMENTS ----------
  */
 
-const byte LedSegmentCount = 3;
+const byte LedSegmentCount = 6;
 const char LedSegmentTopics[LedSegmentCount][TOPIC_MAX_LENGTH] =
 {
+  LED_GARTEN_SUBTOPIC,
+  LED_VG_VERT_4_SUBTOPIC,
   LED_VG_VERT_3_SUBTOPIC,
   LED_VG_VERT_2_SUBTOPIC,
-  LED_VG_VERT_1_SUBTOPIC
+  LED_VG_VERT_1_SUBTOPIC,
+  LED_VG_SEITE_SUBTOPIC,
 };
 const byte LedSegmentLedOffsets[LedSegmentCount] =
 {
   0,
-  20,
-  40
+  12,
+  24,
+  36,
+  48,
+  60,
 };
 const byte LedSegmentLedCounts[LedSegmentCount] =
 {
-  20,
-  20,
-  20
+  12,
+  12,
+  12,
+  12,
+  12,
+  71
 };
 // 3 byte needed for each
 const byte LedSegmentMemoryAddresses[LedSegmentCount] =
 {
+  LED_GARTEN_MEMORY_ADDRESS,
+  LED_VG_VERT_4_MEMORY_ADDRESS,
   LED_VG_VERT_3_MEMORY_ADDRESS,
   LED_VG_VERT_2_MEMORY_ADDRESS,
-  LED_VG_VERT_1_MEMORY_ADDRESS
+  LED_VG_VERT_1_MEMORY_ADDRESS,
+  LED_VG_SEITE_MEMORY_ADDRESS
 };
