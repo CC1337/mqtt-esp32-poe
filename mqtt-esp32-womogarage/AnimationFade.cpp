@@ -1,15 +1,10 @@
 #include <EEPROM.h>
 #include "AnimationFade.h"
 
-void AnimationFade::begin(int ledOffset, int ledCount, AddressableLeds* leds) {
-  _ledOffset = ledOffset;
-  _ledCount = ledCount;
-  _leds = leds;
+void AnimationFade::afterBegin() {
 }
 
-void AnimationFade::start(byte targetLevel) {
-  _targetLevel = targetLevel;
-  _isRunning = true;
+void AnimationFade::afterStart() {
 }
 
 String AnimationFade::getName() {
@@ -27,8 +22,4 @@ void AnimationFade::doAnimationStep(byte animationStep) {
   }
 
   _isRunning = animationStep != 100;
-}
-
-bool AnimationFade::isRunning() {
-  return _isRunning;
 }

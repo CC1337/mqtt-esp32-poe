@@ -29,13 +29,17 @@ void LedSegment::begin(int ledOffset, int ledCount, String subtopic, int memoryA
 }
 
 void LedSegment::prepareAnimations() {
-  _animationNone.begin(_ledOffset, _ledCount, _leds);
-  _animationFade.begin(_ledOffset, _ledCount, _leds);
-  _animationFlicker.begin(_ledOffset, _ledCount, _leds);
+  _animationNone = new AnimationNone();
+  _animationFade = new AnimationFade();
+  _animationFlicker = new AnimationFlicker();
   
-  _animationNames[ANIMATION_NONE] = _animationNone.getName();
-  _animationNames[ANIMATION_FADE] = _animationFade.getName();
-  _animationNames[ANIMATION_FLICKER] = _animationFlicker.getName();
+  _animationNone->begin(_ledOffset, _ledCount, _leds);
+  _animationFade->begin(_ledOffset, _ledCount, _leds);
+  _animationFlicker->begin(_ledOffset, _ledCount, _leds);
+  
+  _animationNames[ANIMATION_NONE] = _animationNone->getName();
+  _animationNames[ANIMATION_FADE] = _animationFade->getName();
+  _animationNames[ANIMATION_FLICKER] = _animationFlicker->getName();
 }
 
 void LedSegment::restoreFromEepromAndPublish() {
@@ -93,17 +97,17 @@ void LedSegment::loop() {
   
   switch(_activeAnimation) {
     case ANIMATION_FADE:
-      _animationFade.doAnimationStep(_animationStep);
-      animationIsRunning = _animationFade.isRunning();
+      _animationFade->doAnimationStep(_animationStep);
+      animationIsRunning = _animationFade->isRunning();
       break;
     case ANIMATION_FLICKER:
-      _animationFlicker.doAnimationStep(_animationStep);
-      animationIsRunning = _animationFlicker.isRunning();
+      _animationFlicker->doAnimationStep(_animationStep);
+      animationIsRunning = _animationFlicker->isRunning();
       break;
     case ANIMATION_NONE:
     default:
-      _animationNone.doAnimationStep();
-      animationIsRunning = _animationNone.isRunning();
+      _animationNone->doAnimationStep(_animationStep);
+      animationIsRunning = _animationNone->isRunning();
       break;
   }
 
@@ -186,14 +190,14 @@ void LedSegment::callback(String receivedMessageTopic, String newValueString) {
 void LedSegment::setLevel(byte newValue) {
   switch(_animation) {
     case ANIMATION_FADE:
-      _animationFade.start(newValue);
+      _animationFade->start(newValue, _level);
       break;
     case ANIMATION_FLICKER:
-      _animationFlicker.start(newValue, _level);
+      _animationFlicker->start(newValue, _level);
       break;
     case ANIMATION_NONE:
     default:
-      _animationNone.start(newValue);
+      _animationNone->start(newValue, _level);
       break;
   }
 

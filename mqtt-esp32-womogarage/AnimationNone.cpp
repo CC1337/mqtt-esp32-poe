@@ -1,28 +1,19 @@
 #include <EEPROM.h>
 #include "AnimationNone.h"
 
-void AnimationNone::begin(int ledOffset, int ledCount, AddressableLeds* leds) {
-  _ledOffset = ledOffset;
-  _ledCount = ledCount;
-  _leds = leds;
+void AnimationNone::afterBegin() {
 }
 
-void AnimationNone::start(byte targetLevel) {
-  _targetLevel = targetLevel;
-  _isRunning = true;
+void AnimationNone::afterStart() {
 }
 
 String AnimationNone::getName() {
   return "none";
 }
 
-void AnimationNone::doAnimationStep() {
+void AnimationNone::doAnimationStep(byte animationStep) {
   for (int i = _ledOffset; i < _ledOffset + _ledCount; i++) {
     _leds->setLedWhite(i, _leds->linearPwm(_targetLevel));
   }
   _isRunning = false;
-}
-
-bool AnimationNone::isRunning() {
-  return _isRunning;
 }

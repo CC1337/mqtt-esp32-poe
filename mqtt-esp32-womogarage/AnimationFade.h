@@ -1,25 +1,17 @@
-#include <Arduino.h>
-#include "config.h"
-#include "AddressableLeds.h"
+#include "Animation.h"
 
 #ifndef AnimationFade_h
 #define AnimationFade_h
 
 
-class AnimationFade {
+class AnimationFade : public Animation {
   private:
-    int _ledOffset;
-    int _ledCount;
-    AddressableLeds* _leds;
-    byte _targetLevel;
-    bool _isRunning = false;
 
   public:
-    void begin(int ledOffset, int ledCount, AddressableLeds* leds);
-    void start(byte targetLevel);
+    void afterBegin();
+    void afterStart();
     String getName();
     void doAnimationStep(byte animationStep);
-    bool isRunning();
 };
 
 #endif

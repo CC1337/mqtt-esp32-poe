@@ -1,10 +1,7 @@
 #include <EEPROM.h>
 #include "AnimationFlicker.h"
 
-void AnimationFlicker::begin(int ledOffset, int ledCount, AddressableLeds* leds) {
-  _ledOffset = ledOffset;
-  _ledCount = ledCount;
-  _leds = leds;
+void AnimationFlicker::afterBegin() {
   _randomIndex = new int[_ledCount];
   _randomIndex2 = new int[_ledCount];
   _randomIndex3 = new int[_ledCount];
@@ -13,20 +10,16 @@ void AnimationFlicker::begin(int ledOffset, int ledCount, AddressableLeds* leds)
     _randomIndex2[i] = _ledOffset + i;
     _randomIndex3[i] = _ledOffset + i;
   }
-
 }
 
-void AnimationFlicker::start(byte targetLevel, byte previousLevel) {
-  _targetLevel = targetLevel;
-  _previousLevel = previousLevel;
-  _step1Level = (2 * previousLevel + targetLevel) / 3;
-  _step2Level = (previousLevel + 2 * targetLevel) / 3;
+void AnimationFlicker::afterStart() {
+  _step1Level = (2 * _previousLevel + _targetLevel) / 3;
+  _step2Level = (_previousLevel + 2 * _targetLevel) / 3;
   for (int i = 0; i < _ledCount; i++) {
     swapRandomIndex(_randomIndex, i, i + (rand() % _ledCount-i));
     swapRandomIndex(_randomIndex2, i, i + (rand() % _ledCount-i));
     swapRandomIndex(_randomIndex3, i, i + (rand() % _ledCount-i));
   }
-  _isRunning = true;
 }
 
 void AnimationFlicker::swapRandomIndex(int* arr, int a, int b) {
@@ -92,8 +85,4 @@ void AnimationFlicker::doAnimationStep(byte animationStep) {
   }
 
   _isRunning = animationStep != 100;
-}
-
-bool AnimationFlicker::isRunning() {
-  return _isRunning;
 }

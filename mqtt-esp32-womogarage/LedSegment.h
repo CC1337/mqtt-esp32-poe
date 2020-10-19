@@ -34,9 +34,9 @@ class LedSegment {
     unsigned long _lastAnimationStepMicros = 0;
     MqttPubSub* _mqtt;
     AddressableLeds* _leds;
-    AnimationNone _animationNone;
-    AnimationFade _animationFade;
-    AnimationFlicker _animationFlicker;
+    Animation* _animationNone;
+    Animation* _animationFade;
+    Animation* _animationFlicker;
     String _animationNames[ANIMATIONS_COUNT];
     const byte _numAnimations = ANIMATIONS_COUNT;
     void prepareAnimations();
