@@ -29,17 +29,17 @@ void LedSegment::begin(int ledOffset, int ledCount, String subtopic, int memoryA
 }
 
 void LedSegment::prepareAnimations() {
-  _animationNone = new AnimationNone();
-  _animationFade = new AnimationFade();
-  _animationFlicker = new AnimationFlicker();
-  
-  _animationNone->begin(_ledOffset, _ledCount, _leds);
-  _animationFade->begin(_ledOffset, _ledCount, _leds);
-  _animationFlicker->begin(_ledOffset, _ledCount, _leds);
-  
-  _animationNames[ANIMATION_NONE] = _animationNone->getName();
-  _animationNames[ANIMATION_FADE] = _animationFade->getName();
-  _animationNames[ANIMATION_FLICKER] = _animationFlicker->getName();
+  Animation* animationNone = new AnimationNone();
+  Animation* animationFade = new AnimationFade();
+  Animation* animationFlicker = new AnimationFlicker();
+ 
+  _animations[ANIMATION_NONE] = animationNone;
+  _animations[ANIMATION_FADE] = animationFade;
+  _animations[ANIMATION_FLICKER] = animationFlicker;
+
+  for (int i=0; i<_numAnimations; i++) {
+    _animations[i]->begin(_ledOffset, _ledCount, _leds);
+  }
 }
 
 void LedSegment::restoreFromEepromAndPublish() {
@@ -59,7 +59,7 @@ String LedSegment::getPossibleAnimationsJsonArray() {
   String animationsPossible = String("[ ");
   for (int i=0; i<_numAnimations; i++) {
     animationsPossible.concat("\"");
-    animationsPossible.concat(_animationNames[i]);
+    animationsPossible.concat(_animations[i]->getName());
     animationsPossible.concat("\"");
     if (i < _numAnimations - 1)
       animationsPossible.concat(", ");
@@ -72,12 +72,12 @@ String LedSegment::number2AnimationName(byte number) {
   if (number < 0 || number >= _numAnimations)
     number = 0;
 
-  return _animationNames[number];
+  return _animations[number]->getName();
 }
 
 byte LedSegment::animationName2Number(String animationName) {
   for (int i=0; i<_numAnimations; i++) {
-    if (String(_animationNames[i]).equalsIgnoreCase(animationName))
+    if (String(_animations[i]->getName()).equalsIgnoreCase(animationName))
       return i;
   }
   return 0;
@@ -93,25 +93,9 @@ void LedSegment::loop() {
   if (_animationStep < 0 || !_leds->powerOnDelayIsOver() || waitingForNextFrame())
     return;
 
-  bool animationIsRunning = false;
-  
-  switch(_activeAnimation) {
-    case ANIMATION_FADE:
-      _animationFade->doAnimationStep(_animationStep);
-      animationIsRunning = _animationFade->isRunning();
-      break;
-    case ANIMATION_FLICKER:
-      _animationFlicker->doAnimationStep(_animationStep);
-      animationIsRunning = _animationFlicker->isRunning();
-      break;
-    case ANIMATION_NONE:
-    default:
-      _animationNone->doAnimationStep(_animationStep);
-      animationIsRunning = _animationNone->isRunning();
-      break;
-  }
-
-  if (!animationIsRunning) {
+  _animations[_activeAnimation]->doAnimationStep(_animationStep);
+ 
+  if (!_animations[_activeAnimation]->isRunning()) {
     _animationStep = -1;
     return;
   }
@@ -188,18 +172,7 @@ void LedSegment::callback(String receivedMessageTopic, String newValueString) {
 }
 
 void LedSegment::setLevel(byte newValue) {
-  switch(_animation) {
-    case ANIMATION_FADE:
-      _animationFade->start(newValue, _level);
-      break;
-    case ANIMATION_FLICKER:
-      _animationFlicker->start(newValue, _level);
-      break;
-    case ANIMATION_NONE:
-    default:
-      _animationNone->start(newValue, _level);
-      break;
-  }
+  _animations[_animation]->start(newValue, _level);
 
   _level = newValue;
   

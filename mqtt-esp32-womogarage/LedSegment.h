@@ -8,6 +8,13 @@
 #ifndef LedSegment_h
 #define LedSegment_h
 
+/* Adding new animation:
+ * - increase ANIMATIONS_COUNT below
+ * - add new variable with new animation's name below
+ * - implement new .h/.cpp
+ * - add include above for new animation .h
+ * - adjust prepareAnimations() implementation in LedSegment.cpp file
+ */
 #define ANIMATIONS_COUNT 3
 #define ANIMATION_NONE 0
 #define ANIMATION_FADE 1
@@ -34,10 +41,7 @@ class LedSegment {
     unsigned long _lastAnimationStepMicros = 0;
     MqttPubSub* _mqtt;
     AddressableLeds* _leds;
-    Animation* _animationNone;
-    Animation* _animationFade;
-    Animation* _animationFlicker;
-    String _animationNames[ANIMATIONS_COUNT];
+    Animation* _animations[ANIMATIONS_COUNT];
     const byte _numAnimations = ANIMATIONS_COUNT;
     void prepareAnimations();
     void restoreFromEepromAndPublish();
