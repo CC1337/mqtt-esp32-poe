@@ -8,7 +8,10 @@
  * ---------- DEBUG ----------
  */
 
+// true = serial output enabled
 #define DEBUG true
+
+// switch IP settings for DEV and PROD.
 #define OUTDOOR_VLAN false
 
 
@@ -31,13 +34,13 @@
  * ---------- MQTT BASE SETUP ----------
  */
 
-#define MQTT_TOPIC "ESP32-Wohnmobilgarage"
+#define MQTT_TOPIC "ESP32-Wohnmobilgarage"    // Main name of this device
 #if OUTDOOR_VLAN
   #define MQTT_SERVER_IP "192.168.2.13"       // IP address of the MQTT broker
 #else
   #define MQTT_SERVER_IP "192.168.0.90"       // IP address of the MQTT broker
 #endif
-#define MQTT_SERVER_PORT 1883               // IP port of the MQTT broker
+#define MQTT_SERVER_PORT 1883                 // IP port of the MQTT broker
 #define MQTT_SERVER_CLIENTNAME MQTT_TOPIC;
 #define MQTT_SERVER_USERNAME NULL
 #define MQTT_SERVER_PASSWORD NULL
@@ -68,6 +71,10 @@
 
 /*
  * ---------- PINS ----------
+ * - MotionSensors have 3.3V output and they are set to only trigger short high on detection
+ * - Buttons are connected to GND
+ * - Outputs can be connected to MOSFET or Relay boards. For relay boards the output needs to be inverted. Pin low = Relay ON = MQTT state true if inverted = true
+ * - Only one addressable LED pin and only white colored ones are implemented right now.
  */
 
 #define BWM_VORGARTEN_PIN 32
@@ -105,7 +112,7 @@
  */
 
 #define ADDRESSABLE_LED_COUNT 131
-#define ADDRESSABLE_LED_TYPE UCS1903B
+#define ADDRESSABLE_LED_TYPE UCS1903B                     // check FastLED docs for more
 #define ADDRESSABLE_LED_POWER_PIN_INVERT false
 #define ADDRESSABLE_LEDS_POWER_OFF_DELAY_MS 30000
 #define ADDRESSABLE_LEDS_POWER_ON_DELAY_MS 800

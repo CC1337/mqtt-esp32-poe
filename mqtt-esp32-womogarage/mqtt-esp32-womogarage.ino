@@ -1,5 +1,5 @@
 /*
- * This sketch was written for Olimex ESP32-POE.
+ * This sketch was written for Olimex ESP32-POE[-ISO].
  * Various sensors or actuators can be connected to be integrated into your smart home using MQTT (which integrates easily into f.e. ioBroker using the MQTT adapter.
  * Environment specific configuration will likely be done in setup.cpp and config.h only.
  * 
