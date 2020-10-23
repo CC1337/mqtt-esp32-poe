@@ -4,21 +4,22 @@
 #include "AnimationNone.h"
 #include "AnimationFade.h"
 #include "AnimationFlicker.h"
+#include "AnimationMovingFade.h"
 
 #ifndef LedSegment_h
 #define LedSegment_h
 
 /* Adding new animation:
  * - increase ANIMATIONS_COUNT below
- * - add new variable with new animation's name below
  * - implement new .h/.cpp
  * - add include above for new animation .h
  * - adjust prepareAnimations() implementation in LedSegment.cpp file
  */
-#define ANIMATIONS_COUNT 3
+#define ANIMATIONS_COUNT 4
 #define ANIMATION_NONE 0
 #define ANIMATION_FADE 1
 #define ANIMATION_FLICKER 2
+#define ANIMATION_MOVINGFADE 3
 
 class LedSegment {
   private: 

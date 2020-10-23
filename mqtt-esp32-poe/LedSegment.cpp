@@ -32,10 +32,12 @@ void LedSegment::prepareAnimations() {
   Animation* animationNone = new AnimationNone();
   Animation* animationFade = new AnimationFade();
   Animation* animationFlicker = new AnimationFlicker();
+  Animation* animationMovingFade = new AnimationMovingFade();
  
   _animations[ANIMATION_NONE] = animationNone;
   _animations[ANIMATION_FADE] = animationFade;
   _animations[ANIMATION_FLICKER] = animationFlicker;
+  _animations[ANIMATION_MOVINGFADE] = animationMovingFade;
 
   for (int i=0; i<_numAnimations; i++) {
     _animations[i]->begin(_ledOffset, _ledCount, _leds);
