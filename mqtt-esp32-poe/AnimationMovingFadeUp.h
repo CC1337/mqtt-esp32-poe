@@ -1,11 +1,11 @@
 #include "Animation.h"
 
-#ifndef AnimationMovingFade_h
-#define AnimationMovingFade_h
+#ifndef AnimationMovingFadeUp_h
+#define AnimationMovingFadeUp_h
 
 #define MOVINGFADE_GRADIENT_STEP_COUNT 70 // Movingfade gradient width LED count: higher = softer fade. Correlates with array movingFadeGradient below.
 
-class AnimationMovingFade : public Animation {
+class AnimationMovingFadeUp : public Animation {
   private:
     int _animationStepCount;
     int getLedToSet(int gradientStep, int animationStep);

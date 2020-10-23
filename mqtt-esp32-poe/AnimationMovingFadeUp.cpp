@@ -1,25 +1,22 @@
 #include <EEPROM.h>
-#include "AnimationMovingFade.h"
+#include "AnimationMovingFadeUp.h"
 
-void AnimationMovingFade::afterBegin() {
+void AnimationMovingFadeUp::afterBegin() {
   _animationStepCount = _ledOffset + _ledCount + MOVINGFADE_GRADIENT_STEP_COUNT;
 }
 
-void AnimationMovingFade::afterStart() {
+void AnimationMovingFadeUp::afterStart() {
 }
 
-String AnimationMovingFade::getName() {
-  return "movingfade";
+String AnimationMovingFadeUp::getName() {
+  return "movingfadeup";
 }
 
-int AnimationMovingFade::getLedToSet(int gradientStep, int animationStep) {
-  if (true) // TODO direction
-    return animationStep + _ledOffset - gradientStep;
-  else
-    return -animationStep + _ledOffset + _ledCount + gradientStep;
+int AnimationMovingFadeUp::getLedToSet(int gradientStep, int animationStep) {
+  return animationStep + _ledOffset - gradientStep;
 }
 
-void AnimationMovingFade::doAnimationStep(byte animationStep) {
+void AnimationMovingFadeUp::doAnimationStep(byte animationStep) {
   if (animationStep < 0 || animationStep >= _animationStepCount) {
     _isRunning = false;
     return;
