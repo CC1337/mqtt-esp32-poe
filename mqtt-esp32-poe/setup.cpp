@@ -118,15 +118,15 @@ const char LedSegmentTopics[LedSegmentCount][TOPIC_MAX_LENGTH] =
 const byte LedSegmentLedOffsets[LedSegmentCount] =
 {
   0,
-  12,
-  24,
-  36,
-  48,
-  60,
+  14,
+  26,
+  38,
+  50,
+  62,
 };
 const byte LedSegmentLedCounts[LedSegmentCount] =
 {
-  12,
+  14,
   12,
   12,
   12,

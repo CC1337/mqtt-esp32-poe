@@ -111,7 +111,7 @@
  * ---------- ADDRESSABLE LEDS ----------
  */
 
-#define ADDRESSABLE_LED_COUNT 131
+#define ADDRESSABLE_LED_COUNT 133
 #define ADDRESSABLE_LED_TYPE UCS1903B                     // check FastLED docs for more
 #define ADDRESSABLE_LED_POWER_PIN_INVERT false
 #define ADDRESSABLE_LEDS_POWER_OFF_DELAY_MS 30000
