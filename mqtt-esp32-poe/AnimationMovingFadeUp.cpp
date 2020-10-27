@@ -23,6 +23,7 @@ void AnimationMovingFadeUp::doAnimationStep(byte animationStep) {
   }
 
   int ledToSet, newLevel;
+  bool fadeUp = _targetLevel >= _previousLevel;
 
   for (byte i = 0; i < MOVINGFADE_GRADIENT_STEP_COUNT; i++) {
 
@@ -31,12 +32,16 @@ void AnimationMovingFadeUp::doAnimationStep(byte animationStep) {
     if (ledToSet >= _ledOffset + _ledCount || ledToSet < _ledOffset)
       continue;
     
-    if (_targetLevel >= _previousLevel)
-      newLevel = movingFadeGradient[i];
+    if (fadeUp)
+      newLevel = min(movingFadeGradient[i], _targetLevel);
     else
-      newLevel = 100 - movingFadeGradient[i];
+      newLevel = max((byte)(100 - movingFadeGradient[i]), _targetLevel);
 
-    _leds->ledFadeStepToPercentage(ledToSet, newLevel, 100);
+    if (fadeUp) {
+      _leds->setLedWhiteMin(ledToSet, _leds->linearPwm(newLevel));
+    } else {
+      _leds->setLedWhiteMax(ledToSet, _leds->linearPwm(newLevel));
+    }
   }
 
   _isRunning = animationStep < _animationStepCount;

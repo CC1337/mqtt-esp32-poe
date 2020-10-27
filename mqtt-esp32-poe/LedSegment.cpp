@@ -88,9 +88,6 @@ byte LedSegment::animationName2Number(String animationName) {
 }
 
 void LedSegment::loop() {
-  if (_animationStep > 100)
-    _animationStep = -1;
-
   if (_animationStep == 0 && !_leds->powerIsOn())
     _leds->powerOn();
 
