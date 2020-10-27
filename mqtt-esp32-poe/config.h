@@ -34,7 +34,11 @@
  * ---------- MQTT BASE SETUP ----------
  */
 
-#define MQTT_TOPIC "ESP32-Wohnmobilgarage"    // Main name of this device
+#if OUTDOOR_VLAN
+  #define MQTT_TOPIC "ESP32-Wohnmobilgarage"    // Main name of this device
+#else
+  #define MQTT_TOPIC "ESP32-Dev"    // Main name of this device
+#endif
 #if OUTDOOR_VLAN
   #define MQTT_SERVER_IP "192.168.2.13"       // IP address of the MQTT broker
 #else
