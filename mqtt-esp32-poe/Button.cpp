@@ -61,6 +61,7 @@ void Button::loop() {
         _mqtt->publishState(_subtopicState, BUTTON_STATE_MANY);
       reset();
     }
+    checkAndSendResetMessage();
   }
 }
 
@@ -72,4 +73,12 @@ void Button::reset() {
   _lastPressStart = 0;
   _lastReleaseStart = 0;
   _pressCount = 0;
+  _lastStateSent = millis();
+}
+
+void Button::checkAndSendResetMessage() {
+  if (_lastStateSent > 0 && millis() - _lastStateSent > BUTTON_TOPIC_RESET_DELAY) {
+    _mqtt->publishState(_subtopicState, BUTTON_STATE_NONE);
+    _lastStateSent = 0;
+  }
 }

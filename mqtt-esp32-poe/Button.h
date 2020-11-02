@@ -27,10 +27,12 @@ class Button {
     void publishinitialStates();
     unsigned long _lastPressStart = 0;
     unsigned long _lastReleaseStart = 0;
+    unsigned long _lastStateSent = 0;
     byte _pressCount = 0;
     String getPossibleStatesJsonArray();
     bool pressed();
     void reset();
+    void checkAndSendResetMessage();
 
   public:
     void begin(byte pin, String subtopic, MqttPubSub* mqtt);
