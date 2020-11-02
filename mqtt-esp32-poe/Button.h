@@ -3,7 +3,7 @@
 
 #ifndef Button_h
 
-#define BUTTON_STATE_INITIALIZED "initialized"
+#define BUTTON_STATE_NONE "none"
 #define BUTTON_STATE_SINGLE "single"
 #define BUTTON_STATE_DOUBLE "double"
 #define BUTTON_STATE_TRIPLE "triple"
@@ -22,7 +22,7 @@ class Button {
     String _subtopicStateIndex;
     int _memoryAddress;
     MqttPubSub* _mqtt;
-    const char *_states[BUTTON_NUM_STATES] = {BUTTON_STATE_INITIALIZED, BUTTON_STATE_SINGLE, BUTTON_STATE_DOUBLE, BUTTON_STATE_TRIPLE, BUTTON_STATE_MANY, BUTTON_STATE_LONG};
+    const char *_states[BUTTON_NUM_STATES] = {BUTTON_STATE_NONE, BUTTON_STATE_SINGLE, BUTTON_STATE_DOUBLE, BUTTON_STATE_TRIPLE, BUTTON_STATE_MANY, BUTTON_STATE_LONG};
     const byte _numStates = BUTTON_NUM_STATES;
     void publishinitialStates();
     unsigned long _lastPressStart = 0;

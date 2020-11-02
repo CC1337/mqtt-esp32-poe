@@ -13,7 +13,7 @@ void Button::begin(byte pin, String subtopic, MqttPubSub* mqtt) {
 }
 
 void Button::publishinitialStates() {
-  _mqtt->publishState(_subtopicState, BUTTON_STATE_INITIALIZED);
+  _mqtt->publishState(_subtopicState, BUTTON_STATE_NONE);
   _mqtt->publishState(_subtopicStateIndex, getPossibleStatesJsonArray());
 }
 
