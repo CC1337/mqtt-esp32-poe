@@ -59,6 +59,12 @@ void LedSegment::restoreFromEepromAndPublish() {
   _mqtt->publishState(_subtopicSpeed, String(eepromSpeed));
 }
 
+void LedSegment::resubscribe() {
+  _mqtt->resubscribe(_subtopicLevel);
+  _mqtt->resubscribe(_subtopicAnimation);
+  _mqtt->resubscribe(_subtopicSpeed);
+}
+
 String LedSegment::getPossibleAnimationsJsonArray() {
   String animationsPossible = String("[ ");
   for (int i=0; i<_numAnimations; i++) {

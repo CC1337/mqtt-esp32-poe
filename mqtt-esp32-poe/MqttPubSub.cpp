@@ -17,6 +17,21 @@ void MqttPubSub::subscribe(String subtopic) {
   Serial.println("Subscribed to: " + topicToSubscribe);
 }
 
+void MqttPubSub::resubscribe(String subtopic) {
+  if(!_initialized)
+    return;
+  
+  String topicToSubscribe = _topic;
+  topicToSubscribe.concat("/");
+  topicToSubscribe.concat(subtopic);
+  
+  _mqttClient->unsubscribe(topicToSubscribe.c_str());
+  Serial.println("Unsubscribed from: " + topicToSubscribe);
+  
+  _mqttClient->subscribe(topicToSubscribe.c_str());
+  Serial.println("(Re)Subscribed to: " + topicToSubscribe);
+}
+
 void MqttPubSub::publishState(String subtopic, String payload) {
   if(!_initialized)
     return;

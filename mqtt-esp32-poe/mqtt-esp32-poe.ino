@@ -77,6 +77,11 @@ void initDigitalStateOutputs() {
     digitalStateOutputs[i].begin(DigitalStateOutputPins[i], DigitalStateOutputInverted[i], DigitalStateOutputTopics[i], DigitalStateOutputMemoryAddresses[i], &mqtt);
 }
 
+void resubscribeDigitalStateOutputs() {
+  for (byte i=0; i<DigitalStateOutputCount; i++)
+    digitalStateOutputs[i].resubscribe();
+}
+
 void callbackDigitalStateOutputs(String messageTopic, String newState) {
   for (byte i=0; i<DigitalStateOutputCount; i++) {
     digitalStateOutputs[i].callback(messageTopic, newState);
@@ -91,6 +96,11 @@ InfoLed infoLeds[InfoLedCount];
 void initInfoLeds() {
   for (byte i=0; i<InfoLedCount; i++)
     infoLeds[i].begin(InfoLedPins[i], InfoLedTopics[i], InfoLedMemoryAddresses[i], &mqtt);
+}
+
+void resubscribeInfoLeds() {
+  for (byte i=0; i<InfoLedCount; i++)
+    infoLeds[i].resubscribe();
 }
 
 void callbackInfoLeds(String messageTopic, String newState) {
@@ -123,6 +133,11 @@ void initLedSegments() {
     ledSegments[i].begin(LedSegmentLedOffsets[i], LedSegmentLedCounts[i], LedSegmentTopics[i], LedSegmentMemoryAddresses[i], &leds, &mqtt);
 }
 
+void resubscribeLedSegments() {
+  for (byte i=0; i<LedSegmentCount; i++)
+    ledSegments[i].resubscribe();
+}
+
 void callbackLedSegments(String messageTopic, String newState) {
   for (byte i=0; i<LedSegmentCount; i++) {
     ledSegments[i].callback(messageTopic, newState);
@@ -140,13 +155,21 @@ void loopLedSegments() {
 
 // ------------------------------------ MODULES HOOKUP POINTS ------------------------------------
 
-// Put initialization of modules that might need MQTT reference here to make sure it's ready
+// Put initialization of modules that might need MQTT reference here to make sure it's ready. 
+// Subscriptions should be done also in resubscribeAfterMqttRestore() as connection reset needs resubscribing!
 void afterMqttInit() {
   initMotionSensors();
   initButtons();
   initDigitalStateOutputs();
   initInfoLeds();
   initLedSegments();
+}
+
+// All MQTT subscriptions must be done again here (unsubscribe and subscribe), this will also be called after reconnecting to MQTT.
+void resubscribeAfterMqttRestore() {
+  resubscribeDigitalStateOutputs();
+  resubscribeInfoLeds();
+  resubscribeLedSegments();
 }
 
 // Put methods here that should be called every main loop cycle while MQTT is connected
@@ -218,8 +241,12 @@ void mqttReconnect() {
     //if (mqttClient.connect(MqttClientName, MqttUsername, MqttPassword) { // optional with credentials
       Serial.println(F(" connected."));
       if (!mqttHasBeenInitializedBefore) {
-          publishInitialStatus();
-          afterMqttInit();
+        Serial.println(F("Publishing initial status and executing afterMqttInit()."));
+        publishInitialStatus();
+        afterMqttInit();
+      } else {
+        Serial.println(F("Executing resubscribeAfterMqttRestore() after connection restore."));
+        resubscribeAfterMqttRestore();
       }
       mqttHasBeenInitializedBefore = true;
     } else {

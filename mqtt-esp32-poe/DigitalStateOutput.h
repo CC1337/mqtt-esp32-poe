@@ -17,6 +17,7 @@ class DigitalStateOutput {
 
   public:
     void begin(byte pin, bool inverted, String subtopic, int memoryAddress, MqttPubSub* mqtt);
+    void resubscribe();
     void callback(String receivedMessageTopic, String newState);
 };
 

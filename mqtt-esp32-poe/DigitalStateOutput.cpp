@@ -25,6 +25,10 @@ void DigitalStateOutput::setOutput(bool newState) {
   digitalWrite(_pin, _inverted ? !newState : newState);
 }
 
+void DigitalStateOutput::resubscribe() {
+  _mqtt->resubscribe(_subtopic);
+}
+
 void DigitalStateOutput::callback(String receivedMessageTopic, String newState) {
   if(_pin == 0)
     return;

@@ -35,6 +35,7 @@ class InfoLed {
 
   public:
     void begin(byte pin, String subtopic, int memoryAddress, MqttPubSub* mqtt);
+    void resubscribe();
     void callback(String receivedMessageTopic, String newState);
     void loop();
 };

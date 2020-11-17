@@ -59,6 +59,7 @@ class LedSegment {
 
   public:
     void begin(int firstLed, int ledOffset, String subtopic, int memoryAddress, AddressableLeds* leds, MqttPubSub* mqtt);
+    void resubscribe();
     void loop();
     void callback(String receivedMessageTopic, String newValue);
 };

@@ -20,6 +20,10 @@ void InfoLed::restoreFromEepromAndPublish() {
   _mqtt->publishState(_subtopicStateIndex, getPossibleStatesJsonArray());
 }
 
+void InfoLed::resubscribe() {
+  _mqtt->resubscribe(_subtopicState);
+}
+
 String InfoLed::getPossibleStatesJsonArray() {
   String statesPossible = String("[ ");
   for (int i=0; i<_numStates; i++) {

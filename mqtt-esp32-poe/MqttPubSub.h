@@ -13,6 +13,7 @@ class MqttPubSub {
   public:
     void begin(PubSubClient* mqttClient, String topic);
     void subscribe(String subtopic);
+    void resubscribe(String subtopic);
     void publishState(String subtopic, String payload);
     void publishMessage(String subtopic, String action, String payload, String fullMessage);
 };
