@@ -13,7 +13,6 @@ void DigitalStateOutput::begin(byte pin, bool inverted, String subtopic, int mem
 
   _mqtt->subscribe(_subtopic);
   restoreFromEepromAndPublish();
-
 }
 
 void DigitalStateOutput::restoreFromEepromAndPublish() {
