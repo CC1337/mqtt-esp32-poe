@@ -43,8 +43,19 @@ void DigitalStateOutput::callback(String receivedMessageTopic, String newState) 
     else
       return;
 
-    if (targetState == _inverted ? !digitalRead(_pin) : digitalRead(_pin))
+    if (targetState == _inverted ? !digitalRead(_pin) : digitalRead(_pin)) {
+      _publishedMsgCount = 0;
       return;
+    }
+
+    if (_publishedMsgCount > 1) {
+      _publishedMsgCount--;
+      Serial.print("Dropping possibly old message: ");
+      Serial.print(_subtopic);
+      Serial.print(F(" = "));
+      Serial.println(targetState);
+      return;
+    }
 
     Serial.print(_subtopic);
     Serial.print(F(" = "));
@@ -56,5 +67,6 @@ void DigitalStateOutput::callback(String receivedMessageTopic, String newState) 
     }
     setOutput(targetState);
     _mqtt->publishState(_subtopic, bool2Str(targetState));
+    _publishedMsgCount++;
   }
 }

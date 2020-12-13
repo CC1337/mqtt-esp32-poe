@@ -11,6 +11,7 @@ class DigitalStateOutput {
     bool _inverted;
     String _subtopic;
     int _memoryAddress;
+    byte _publishedMsgCount = 0;
     MqttPubSub* _mqtt;
     void restoreFromEepromAndPublish();
     void setOutput(bool newState);

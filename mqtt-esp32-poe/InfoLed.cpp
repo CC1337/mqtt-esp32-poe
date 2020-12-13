@@ -102,8 +102,19 @@ void InfoLed::callback(String receivedMessageTopic, String newStateStr) {
   if (receivedMessageTopic.endsWith(_subtopicState)) {
     byte targetStateNum = state2Number(newStateStr);
 
-    if (targetStateNum == _state)
+    if (targetStateNum == _state) {
+      _publishedMsgCount = 0;
       return;
+    }
+
+    if (_publishedMsgCount > 1) {
+      _publishedMsgCount--;
+      Serial.print("Dropping possibly old message: ");
+      Serial.print(_subtopic);
+      Serial.print(F(" = "));
+      Serial.println(targetStateNum);
+      return;
+    }
 
     Serial.print(_subtopic);
     Serial.print(F(" = "));
@@ -115,5 +126,6 @@ void InfoLed::callback(String receivedMessageTopic, String newStateStr) {
     }
     setState(targetStateNum);
     _mqtt->publishState(_subtopicState, number2State(targetStateNum));
+    _publishedMsgCount++;
   }
 }

@@ -28,6 +28,7 @@ class InfoLed {
     unsigned long _lastBlinkStart = 0;
     int _blinkDelay = 0;
     int _blinkLength = 0;
+    byte _publishedMsgCount = 0;
     String getPossibleStatesJsonArray();
     String number2State(byte number);
     byte state2Number(String state);
